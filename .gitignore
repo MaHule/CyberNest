@@ -1,0 +1,14 @@
+node_modules
+.npm-cache
+dist
+dist-ssr
+*.local
+src-tauri/target
+.DS_Store
+*.log
+
+.npmrc
+.env
+.env*.local
+.vscode/
+.idea/

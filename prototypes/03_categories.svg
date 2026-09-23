@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 800" width="1280" height="800">
+  
+  <defs>
+    <linearGradient id="cyanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <linearGradient id="emeraldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="amberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="cardBgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#162032"/>
+    </linearGradient>
+    <linearGradient id="cardHoverGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#26354D"/>
+      <stop offset="100%" stop-color="#1A2538"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+    <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#0EA5E9" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <style>
+    .font-sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace; }
+  </style>
+
+  <rect width="1280" height="800" rx="10" fill="#0B0F17" stroke="#1E293B" stroke-width="1.5"/>
+
+  
+  <!-- Top Window Header (40px) -->
+  <rect x="0" y="0" width="1280" height="40" fill="#0F172A"/>
+  <line x1="0" y1="40" x2="1280" y2="40" stroke="#1E293B" stroke-width="1"/>
+
+  <!-- Logo & App Title -->
+  <g transform="translate(16, 11)">
+    <path d="M9 2L2 5v6c0 5.5 3.8 10.7 7 12 3.2-1.3 7-6.5 7-12V5L9 2z" fill="#0EA5E9" fill-opacity="0.2" stroke="#0EA5E9" stroke-width="1.6"/>
+    <path d="M6 10l3 3 5-5" fill="none" stroke="#38BDF8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="42" y="25" class="font-sans" font-size="14" font-weight="700" fill="#F8FAFC">CyberNest</text>
+  <rect x="122" y="12" width="76" height="18" rx="4" fill="#1E293B"/>
+  <text x="130" y="24" class="font-mono" font-size="10" fill="#64748B">v0.1.0-alpha</text>
+
+  <!-- Center Quick Search Bar -->
+  <g transform="translate(460, 6)">
+    <rect x="0" y="0" width="360" height="28" rx="6" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <!-- Search Icon -->
+    <path d="M12 9A4 4 0 1 0 4 9a4 4 0 0 0 8 0zm-1 3l3.5 3.5" transform="translate(10, 5)" fill="none" stroke="#64748B" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="34" y="18" class="font-sans" font-size="11" fill="#64748B">快速启动工具、搜索备忘、命令...</text>
+    <!-- Hotkey Pill -->
+    <rect x="296" y="4" width="56" height="20" rx="4" fill="#0F172A" stroke="#475569" stroke-width="0.8"/>
+    <text x="304" y="18" class="font-mono" font-size="9" fill="#94A3B8">Ctrl + K</text>
+  </g>
+
+  <!-- Right Status & Window Controls -->
+  <g transform="translate(1080, 12)">
+    <circle cx="10" cy="8" r="4" fill="#10B981"/>
+    <circle cx="10" cy="8" r="8" fill="#10B981" fill-opacity="0.2"/>
+    <text x="24" y="12" class="font-sans" font-size="11" fill="#94A3B8">SQLite: Ready</text>
+  </g>
+  <g transform="translate(1200, 0)">
+    <!-- Minimize -->
+    <rect x="0" y="0" width="26" height="40" fill="transparent"/>
+    <line x1="8" y1="20" x2="18" y2="20" stroke="#94A3B8" stroke-width="1.5"/>
+    <!-- Maximize -->
+    <rect x="26" y="0" width="26" height="40" fill="transparent"/>
+    <rect x="34" y="15" width="10" height="10" fill="none" stroke="#94A3B8" stroke-width="1.2"/>
+    <!-- Close -->
+    <rect x="52" y="0" width="28" height="40" fill="transparent"/>
+    <line x1="60" y1="15" x2="70" y2="25" stroke="#94A3B8" stroke-width="1.5"/>
+    <line x1="70" y1="15" x2="60" y2="25" stroke="#94A3B8" stroke-width="1.5"/>
+  </g>
+  
+  
+  <!-- Left Sidebar (240px) -->
+  <rect x="0" y="40" width="240" height="760" fill="#0F172A"/>
+  <line x1="240" y1="40" x2="240" y2="800" stroke="#1E293B" stroke-width="1"/>
+
+  <!-- Top Action: + 添加工具 Button -->
+  <g transform="translate(16, 56)">
+    <rect x="0" y="0" width="208" height="38" rx="6" fill="url(#cyanGradient)" filter="none"/>
+    <path d="M12 5v14m-7-7h14" transform="translate(48, 7)" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+    <text x="84" y="24" class="font-sans" font-size="13" font-weight="600" fill="#FFFFFF">添加新工具</text>
+  </g>
+
+  <!-- Section Label: 主导航 -->
+  <text x="20" y="122" class="font-sans" font-size="10" font-weight="700" fill="#64748B" letter-spacing="1">MAIN NAVIGATION</text>
+
+  <!-- Nav Item 1: 首页 Dashboard -->
+  <g transform="translate(0, 134)">
+    
+      <rect x="8" y="0" width="224" height="38" rx="6" fill="transparent"/>
+    
+    <!-- Dashboard Icon -->
+    <path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z" transform="translate(24, 9) scale(0.9)" fill="none" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="54" y="24" class="font-sans" font-size="13" font-weight="500" fill="#94A3B8">首页 (Dashboard)</text>
+  </g>
+
+  <!-- Nav Item 2: 全部工具 All Tools -->
+  <g transform="translate(0, 178)">
+    
+      <rect x="8" y="0" width="224" height="38" rx="6" fill="transparent"/>
+    
+    <!-- Layers Icon -->
+    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" transform="translate(24, 9) scale(0.9)" fill="none" stroke="#94A3B8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="54" y="24" class="font-sans" font-size="13" font-weight="500" fill="#94A3B8">全部工具</text>
+    <!-- Badge -->
+    <rect x="188" y="10" width="32" height="18" rx="9" fill="#334155" fill-opacity="0.6"/>
+    <text x="204" y="23" text-anchor="middle" class="font-mono" font-size="10" font-weight="600" fill="#94A3B8">48</text>
+  </g>
+
+  <!-- Nav Item 3: 分类管理 Categories -->
+  <g transform="translate(0, 222)">
+    
+      <rect x="0" y="0" width="3" height="38" fill="#0EA5E9"/>
+      <rect x="8" y="0" width="224" height="38" rx="6" fill="#1E293B"/>
+    
+    <!-- FolderTree Icon -->
+    <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z" transform="translate(24, 9) scale(0.9)" fill="none" stroke="#38BDF8" stroke-width="1.8"/>
+    <text x="54" y="24" class="font-sans" font-size="13" font-weight="600" fill="#F8FAFC">分类与标签管理</text>
+    <rect x="194" y="10" width="26" height="18" rx="9" fill="#0EA5E9" fill-opacity="0.2"/>
+    <text x="207" y="23" text-anchor="middle" class="font-mono" font-size="10" font-weight="600" fill="#38BDF8">8</text>
+  </g>
+
+  <!-- Section Label: 常用安全分类 -->
+  <text x="20" y="288" class="font-sans" font-size="11" font-weight="700" fill="#94A3B8" letter-spacing="1">QUICK CATEGORIES 快速分类</text>
+
+  <!-- Quick Category Items -->
+  <g transform="translate(0, 304)">
+    <rect x="8" y="0" width="224" height="32" rx="4" fill="transparent"/>
+    <circle cx="32" cy="16" r="4" fill="#0EA5E9"/>
+    <text x="46" y="20" class="font-sans" font-size="13.5" font-weight="500" fill="#E2E8F0">Web 渗透工具</text>
+    <text x="210" y="20" text-anchor="end" class="font-mono" font-size="12" fill="#64748B">16</text>
+  </g>
+  <g transform="translate(0, 338)">
+    <rect x="8" y="0" width="224" height="32" rx="4" fill="transparent"/>
+    <circle cx="32" cy="16" r="4" fill="#10B981"/>
+    <text x="46" y="20" class="font-sans" font-size="13.5" font-weight="500" fill="#E2E8F0">信息收集与探测</text>
+    <text x="210" y="20" text-anchor="end" class="font-mono" font-size="12" fill="#64748B">12</text>
+  </g>
+  <g transform="translate(0, 372)">
+    <rect x="8" y="0" width="224" height="32" rx="4" fill="transparent"/>
+    <circle cx="32" cy="16" r="4" fill="#F59E0B"/>
+    <text x="46" y="20" class="font-sans" font-size="13.5" font-weight="500" fill="#E2E8F0">漏洞扫描与验证</text>
+    <text x="210" y="20" text-anchor="end" class="font-mono" font-size="12" fill="#64748B">8</text>
+  </g>
+  <g transform="translate(0, 406)">
+    <rect x="8" y="0" width="224" height="32" rx="4" fill="transparent"/>
+    <circle cx="32" cy="16" r="4" fill="#A855F7"/>
+    <text x="46" y="20" class="font-sans" font-size="13.5" font-weight="500" fill="#E2E8F0">逆向与二进制分析</text>
+    <text x="210" y="20" text-anchor="end" class="font-mono" font-size="12" fill="#64748B">5</text>
+  </g>
+  <g transform="translate(0, 440)">
+    <rect x="8" y="0" width="224" height="32" rx="4" fill="transparent"/>
+    <circle cx="32" cy="16" r="4" fill="#EF4444"/>
+    <text x="46" y="20" class="font-sans" font-size="13.5" font-weight="500" fill="#E2E8F0">内网渗透与提权</text>
+    <text x="210" y="20" text-anchor="end" class="font-mono" font-size="12" fill="#64748B">4</text>
+  </g>
+
+    <!-- Bottom Section: Settings (Above Engine Ready) + Engine Status & Collapse -->
+  <line x1="16" y1="675" x2="224" y2="675" stroke="#1E293B" stroke-width="1"/>
+
+  <!-- Nav Item: 系统设置 (Pinned to bottom-left above engine ready) -->
+  <g transform="translate(0, 685)">
+    
+      <rect x="8" y="0" width="224" height="36" rx="6" fill="transparent"/>
+    
+    <!-- Settings Gear Icon -->
+    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" transform="translate(24, 8) scale(0.85)" fill="none" stroke="#94A3B8" stroke-width="1.6"/>
+    <text x="54" y="23" class="font-sans" font-size="12" font-weight="500" fill="#94A3B8">系统设置</text>
+    <rect x="180" y="9" width="34" height="18" rx="3" fill="#162032"/>
+    <text x="197" y="21" text-anchor="middle" class="font-mono" font-size="9" fill="#64748B">偏好</text>
+  </g>
+
+  <!-- Engine Ready Status & Collapse Bar (Below Settings) -->
+  <line x1="16" y1="730" x2="224" y2="730" stroke="#1E293B" stroke-width="0.8"/>
+  <g transform="translate(16, 738)">
+    <rect x="0" y="0" width="208" height="28" rx="4" fill="#0B0F17" stroke="#1E293B" stroke-width="0.8"/>
+    <circle cx="12" cy="14" r="3" fill="#10B981"/>
+    <text x="22" y="18" class="font-sans" font-size="11" fill="#64748B">引擎就绪 (v1.0)</text>
+    <!-- Collapse Icon -->
+    <path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" transform="translate(180, 5) scale(0.7)" fill="none" stroke="#64748B" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  
+
+  <!-- Main Content Area: Categories & Tags (1040 x 760) -->
+  <!-- Top Title Banner -->
+  <g transform="translate(264, 52)">
+    <text x="0" y="24" class="font-sans" font-size="18" font-weight="700" fill="#F8FAFC">分类与标签治理中心 (Taxonomy Studio)</text>
+    <text x="0" y="44" class="font-sans" font-size="11" fill="#94A3B8">规划网络安全军火库层级树，统一治理分类色彩标示与标签资产池</text>
+  </g>
+
+  <!-- 2-Column Split Layout (Y: 110, H: 660) -->
+  <g transform="translate(264, 110)">
+    <!-- LEFT COLUMN: Categories Tree & Management (Width 530px) -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="530" height="660" rx="8" fill="#111827" stroke="#1E293B" stroke-width="1"/>
+
+      <!-- Header of Left Col -->
+      <g transform="translate(18, 16)">
+        <!-- Folder Icon -->
+        <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2z" transform="translate(0, 2) scale(0.85)" fill="none" stroke="#38BDF8" stroke-width="1.8"/>
+        <text x="24" y="16" class="font-sans" font-size="14" font-weight="700" fill="#F8FAFC">分类层级体系 (共 8 个分类)</text>
+        <!-- Action Buttons on Right -->
+        <g transform="translate(370, 0)">
+          <rect x="0" y="0" width="124" height="28" rx="4" fill="url(#cyanGradient)"/>
+          <path d="M12 5v14m-7-7h14" transform="translate(10, 5) scale(0.75)" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+          <text x="32" y="18" class="font-sans" font-size="11" font-weight="600" fill="#FFFFFF">新建主分类</text>
+        </g>
+      </g>
+      <line x1="0" y1="56" x2="530" y2="56" stroke="#1E293B" stroke-width="1"/>
+
+      <!-- Category List Items (Draggable) -->
+      <!-- Category 1: Web Pentest -->
+      <g transform="translate(18, 68)">
+        <rect x="0" y="0" width="494" height="62" rx="6" fill="#162032" stroke="#0EA5E9" stroke-width="1" stroke-opacity="0.6"/>
+        <!-- Drag Handle -->
+        <path d="M4 8h16M4 12h16" transform="translate(10, 20) scale(0.7)" stroke="#64748B" stroke-width="2"/>
+        <!-- Color Dot & Icon -->
+        <circle cx="36" cy="31" r="5" fill="#0EA5E9"/>
+        <text x="50" y="28" class="font-sans" font-size="13" font-weight="700" fill="#F8FAFC">Web 渗透测试 (Web Pentest)</text>
+        <text x="50" y="46" class="font-sans" font-size="11" fill="#64748B">包含: 抓包代理、SQL注入、文件上传、XSS利用</text>
+        <!-- Tools Badge -->
+        <rect x="330" y="20" width="58" height="22" rx="11" fill="#0EA5E9" fill-opacity="0.15"/>
+        <text x="359" y="35" text-anchor="middle" class="font-mono" font-size="10" font-weight="700" fill="#38BDF8">16 款</text>
+        <!-- Actions -->
+        <rect x="398" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="419" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#94A3B8">编辑</text>
+        <rect x="446" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="467" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#EF4444">删除</text>
+      </g>
+
+      <!-- Category 2: Reconnaissance -->
+      <g transform="translate(18, 138)">
+        <rect x="0" y="0" width="494" height="62" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+        <path d="M4 8h16M4 12h16" transform="translate(10, 20) scale(0.7)" stroke="#64748B" stroke-width="2"/>
+        <circle cx="36" cy="31" r="5" fill="#10B981"/>
+        <text x="50" y="28" class="font-sans" font-size="13" font-weight="700" fill="#F8FAFC">信息收集与探测 (Reconnaissance)</text>
+        <text x="50" y="46" class="font-sans" font-size="11" fill="#64748B">包含: 端口扫描、子域名爆破、空间测绘、指纹识别</text>
+        <rect x="330" y="20" width="58" height="22" rx="11" fill="#10B981" fill-opacity="0.15"/>
+        <text x="359" y="35" text-anchor="middle" class="font-mono" font-size="10" font-weight="700" fill="#34D399">12 款</text>
+        <rect x="398" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="419" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#94A3B8">编辑</text>
+        <rect x="446" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="467" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#EF4444">删除</text>
+      </g>
+
+      <!-- Category 3: Vuln Scan -->
+      <g transform="translate(18, 208)">
+        <rect x="0" y="0" width="494" height="62" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+        <path d="M4 8h16M4 12h16" transform="translate(10, 20) scale(0.7)" stroke="#64748B" stroke-width="2"/>
+        <circle cx="36" cy="31" r="5" fill="#F59E0B"/>
+        <text x="50" y="28" class="font-sans" font-size="13" font-weight="700" fill="#F8FAFC">漏洞扫描与评估 (Vulnerability Scanning)</text>
+        <text x="50" y="46" class="font-sans" font-size="11" fill="#64748B">包含: PoC/Exp 框架、通用漏洞扫描、弱口令探测</text>
+        <rect x="330" y="20" width="58" height="22" rx="11" fill="#F59E0B" fill-opacity="0.15"/>
+        <text x="359" y="35" text-anchor="middle" class="font-mono" font-size="10" font-weight="700" fill="#FBBF24">8 款</text>
+        <rect x="398" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="419" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#94A3B8">编辑</text>
+        <rect x="446" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="467" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#EF4444">删除</text>
+      </g>
+
+      <!-- Category 4: Reverse Eng -->
+      <g transform="translate(18, 278)">
+        <rect x="0" y="0" width="494" height="62" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+        <path d="M4 8h16M4 12h16" transform="translate(10, 20) scale(0.7)" stroke="#64748B" stroke-width="2"/>
+        <circle cx="36" cy="31" r="5" fill="#A855F7"/>
+        <text x="50" y="28" class="font-sans" font-size="13" font-weight="700" fill="#F8FAFC">逆向与二进制分析 (Reverse Engineering)</text>
+        <text x="50" y="46" class="font-sans" font-size="11" fill="#64748B">包含: 反编译器、动态调试器、固件提取、脱壳分析</text>
+        <rect x="330" y="20" width="58" height="22" rx="11" fill="#A855F7" fill-opacity="0.15"/>
+        <text x="359" y="35" text-anchor="middle" class="font-mono" font-size="10" font-weight="700" fill="#C084FC">5 款</text>
+        <rect x="398" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="419" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#94A3B8">编辑</text>
+        <rect x="446" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="467" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#EF4444">删除</text>
+      </g>
+
+      <!-- Category 5: Privilege Escalation -->
+      <g transform="translate(18, 348)">
+        <rect x="0" y="0" width="494" height="62" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+        <path d="M4 8h16M4 12h16" transform="translate(10, 20) scale(0.7)" stroke="#64748B" stroke-width="2"/>
+        <circle cx="36" cy="31" r="5" fill="#EF4444"/>
+        <text x="50" y="28" class="font-sans" font-size="13" font-weight="700" fill="#F8FAFC">权限提升与横向移动 (Privilege Escalation)</text>
+        <text x="50" y="46" class="font-sans" font-size="11" fill="#64748B">包含: Linux/Windows 提权脚本、域渗透套件、凭据提取</text>
+        <rect x="330" y="20" width="58" height="22" rx="11" fill="#EF4444" fill-opacity="0.15"/>
+        <text x="359" y="35" text-anchor="middle" class="font-mono" font-size="10" font-weight="700" fill="#F87171">4 款</text>
+        <rect x="398" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="419" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#94A3B8">编辑</text>
+        <rect x="446" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="467" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#EF4444">删除</text>
+      </g>
+
+      <!-- Category 6: Incident Response -->
+      <g transform="translate(18, 418)">
+        <rect x="0" y="0" width="494" height="62" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+        <path d="M4 8h16M4 12h16" transform="translate(10, 20) scale(0.7)" stroke="#64748B" stroke-width="2"/>
+        <circle cx="36" cy="31" r="5" fill="#3B82F6"/>
+        <text x="50" y="28" class="font-sans" font-size="13" font-weight="700" fill="#F8FAFC">应急响应与电子取证 (Incident Response)</text>
+        <text x="50" y="46" class="font-sans" font-size="11" fill="#64748B">包含: 内存取证、流量溯源、日志审计、自启动排查</text>
+        <rect x="330" y="20" width="58" height="22" rx="11" fill="#3B82F6" fill-opacity="0.15"/>
+        <text x="359" y="35" text-anchor="middle" class="font-mono" font-size="10" font-weight="700" fill="#60A5FA">3 款</text>
+        <rect x="398" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="419" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#94A3B8">编辑</text>
+        <rect x="446" y="19" width="42" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="0.8"/>
+        <text x="467" y="35" text-anchor="middle" class="font-sans" font-size="10" fill="#EF4444">删除</text>
+      </g>
+
+      <!-- Bottom Hint of Left Col -->
+      <g transform="translate(18, 620)">
+        <rect x="0" y="0" width="494" height="28" rx="4" fill="#0B0F17"/>
+        <text x="14" y="18" class="font-sans" font-size="11" fill="#64748B">💡 提示: 拖拽调整顺序将即时同步至左侧导航栏与仪表盘快捷入口</text>
+      </g>
+    </g>
+
+    <!-- RIGHT COLUMN: Tags Management Pool (Width 440px) -->
+    <g transform="translate(550, 0)">
+      <rect x="0" y="0" width="440" height="660" rx="8" fill="#111827" stroke="#1E293B" stroke-width="1"/>
+
+      <!-- Header of Right Col -->
+      <g transform="translate(18, 16)">
+        <path d="M7 7h.01M7 3h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" transform="translate(0, 2) scale(0.85)" fill="none" stroke="#F59E0B" stroke-width="1.8"/>
+        <text x="24" y="16" class="font-sans" font-size="14" font-weight="700" fill="#F8FAFC">标签资产池 (共 24 个标签)</text>
+      </g>
+      <line x1="0" y1="56" x2="440" y2="56" stroke="#1E293B" stroke-width="1"/>
+
+      <!-- Quick Add Tag Input Bar -->
+      <g transform="translate(18, 68)">
+        <rect x="0" y="0" width="230" height="34" rx="6" fill="#162032" stroke="#334155" stroke-width="1"/>
+        <text x="14" y="22" class="font-sans" font-size="11" fill="#64748B">输入新标签名称 (如 #ActiveDirectory)</text>
+        <!-- Color Picker Pill -->
+        <g transform="translate(240, 0)">
+          <rect x="0" y="0" width="70" height="34" rx="6" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+          <circle cx="16" cy="17" r="5" fill="#0EA5E9"/>
+          <text x="28" y="21" class="font-sans" font-size="11" fill="#CBD5E1">色彩 ▾</text>
+        </g>
+        <!-- Add Button -->
+        <g transform="translate(320, 0)">
+          <rect x="0" y="0" width="84" height="34" rx="6" fill="url(#cyanGradient)"/>
+          <text x="42" y="21" text-anchor="middle" class="font-sans" font-size="11" font-weight="600" fill="#FFFFFF">+ 添加</text>
+        </g>
+      </g>
+
+      <!-- Tag Cloud Matrix -->
+      <g transform="translate(18, 120)">
+        <text x="0" y="0" class="font-sans" font-size="11" font-weight="700" fill="#64748B">已有标签矩阵 (点击可选中并维护):</text>
+
+        <!-- Row 1 -->
+        <g transform="translate(0, 12)">
+          <!-- Selected Tag: #Web -->
+          <rect x="0" y="0" width="84" height="28" rx="6" fill="#0EA5E9" fill-opacity="0.2" stroke="#0EA5E9" stroke-width="1.5"/>
+          <text x="42" y="18" text-anchor="middle" class="font-mono" font-size="11" font-weight="700" fill="#38BDF8">#Web (18)</text>
+
+          <rect x="92" y="0" width="105" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="144" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#Python3 (14)</text>
+
+          <rect x="205" y="0" width="82" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="246" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#GUI (22)</text>
+
+          <rect x="295" y="0" width="80" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="335" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#CLI (16)</text>
+        </g>
+
+        <!-- Row 2 -->
+        <g transform="translate(0, 48)">
+          <rect x="0" y="0" width="94" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="47" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#Recon (12)</text>
+
+          <rect x="102" y="0" width="84" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="144" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#Proxy (8)</text>
+
+          <rect x="194" y="0" width="76" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="232" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#Java (6)</text>
+
+          <rect x="278" y="0" width="76" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="316" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#PoC (7)</text>
+        </g>
+
+        <!-- Row 3 -->
+        <g transform="translate(0, 84)">
+          <rect x="0" y="0" width="96" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="48" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#Exploit (5)</text>
+
+          <rect x="104" y="0" width="96" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="152" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#Reverse (5)</text>
+
+          <rect x="208" y="0" width="96" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="256" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#Traffic (4)</text>
+        </g>
+
+        <!-- Row 4 -->
+        <g transform="translate(0, 120)">
+          <rect x="0" y="0" width="88" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="44" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#OSINT (6)</text>
+
+          <rect x="96" y="0" width="96" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="144" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#Fuzzing (4)</text>
+
+          <rect x="200" y="0" width="108" height="28" rx="6" fill="#162032" stroke="#1E293B" stroke-width="1"/>
+          <text x="254" y="18" text-anchor="middle" class="font-mono" font-size="11" fill="#94A3B8">#Password (3)</text>
+        </g>
+      </g>
+
+      <!-- Selected Tag Inspector & Detail Card -->
+      <g transform="translate(18, 300)">
+        <rect x="0" y="0" width="404" height="220" rx="8" fill="#162032" stroke="#334155" stroke-width="1"/>
+        <text x="16" y="28" class="font-sans" font-size="13" font-weight="700" fill="#F8FAFC">当前选中的标签资产详情</text>
+        <line x1="0" y1="42" x2="404" y2="42" stroke="#1E293B" stroke-width="1"/>
+
+        <!-- Details -->
+        <text x="16" y="68" class="font-sans" font-size="12" fill="#94A3B8">标签名:</text>
+        <rect x="76" y="52" width="70" height="24" rx="4" fill="#0EA5E9" fill-opacity="0.2"/>
+        <text x="111" y="68" text-anchor="middle" class="font-mono" font-size="11" font-weight="700" fill="#38BDF8">#Web</text>
+
+        <text x="16" y="104" class="font-sans" font-size="12" fill="#94A3B8">主题色系:</text>
+        <circle cx="86" cy="100" r="6" fill="#0EA5E9"/>
+        <text x="100" y="104" class="font-mono" font-size="11" fill="#CBD5E1">Cyber Cyan (#0EA5E9)</text>
+
+        <text x="16" y="140" class="font-sans" font-size="12" fill="#94A3B8">关联工具:</text>
+        <text x="76" y="140" class="font-sans" font-size="12" font-weight="600" fill="#F8FAFC">共 18 款安全工具正在引用该标签</text>
+
+        <!-- Action Buttons -->
+        <g transform="translate(16, 166)">
+          <rect x="0" y="0" width="115" height="34" rx="6" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+          <text x="57" y="21" text-anchor="middle" class="font-sans" font-size="11" fill="#CBD5E1">✏ 重命名标签</text>
+
+          <rect x="125" y="0" width="125" height="34" rx="6" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+          <text x="187" y="21" text-anchor="middle" class="font-sans" font-size="11" fill="#CBD5E1">⇄ 合并至其他标签</text>
+
+          <rect x="260" y="0" width="112" height="34" rx="6" fill="#1E293B" stroke="#EF4444" stroke-width="0.8"/>
+          <text x="316" y="21" text-anchor="middle" class="font-sans" font-size="11" fill="#EF4444">🗑 删除标签</text>
+        </g>
+      </g>
+
+      <!-- Bottom Hint of Right Col -->
+      <g transform="translate(18, 620)">
+        <rect x="0" y="0" width="404" height="28" rx="4" fill="#0B0F17"/>
+        <text x="14" y="18" class="font-sans" font-size="11" fill="#64748B">清理 0 引用标签可精简工具过滤时的胶囊选择项</text>
+      </g>
+    </g>
+  </g>
+  
+  <!-- Bottom StatusBar (28px) -->
+  <rect x="0" y="772" width="1280" height="28" fill="#0D121F"/>
+  <line x1="0" y1="772" x2="1280" y2="772" stroke="#1E293B" stroke-width="1"/>
+
+  <!-- Left: Engine Status -->
+  <g transform="translate(16, 780)">
+    <circle cx="4" cy="6" r="3" fill="#10B981"/>
+    <text x="14" y="10" class="font-mono" font-size="10" font-weight="600" fill="#10B981">SQLITE / INDEXEDDB 就绪</text>
+    <line x1="165" y1="0" x2="165" y2="12" stroke="#334155" stroke-width="1"/>
+    <text x="178" y="10" class="font-mono" font-size="10" fill="#94A3B8">工具资产: <tspan fill="#F8FAFC" font-weight="700">48</tspan></text>
+    <text x="260" y="10" class="font-mono" font-size="10" fill="#94A3B8">常驻收藏: <tspan fill="#F59E0B" font-weight="700">6</tspan></text>
+  </g>
+
+  <!-- Center: Protection Notice -->
+  <g transform="translate(540, 780)">
+    <text x="0" y="10" class="font-sans" font-size="10" fill="#64748B">🛡 100% 离线零遥测保护已启用</text>
+  </g>
+
+  <!-- Right: Shortcut reminders -->
+  <g transform="translate(1120, 775)">
+    <rect x="0" y="2" width="68" height="18" rx="3" fill="#1E293B"/>
+    <text x="34" y="14" text-anchor="middle" class="font-mono" font-size="9" fill="#94A3B8">Alt+Space</text>
+    <rect x="74" y="2" width="58" height="18" rx="3" fill="#1E293B"/>
+    <text x="103" y="14" text-anchor="middle" class="font-mono" font-size="9" fill="#94A3B8">Tauri 2.0</text>
+  </g>
+  
+</svg>

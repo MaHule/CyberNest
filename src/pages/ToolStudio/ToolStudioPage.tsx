@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp, getCategoryBadgeStyle } from '../../context/AppContext';
 import { Tool, ToolType, ToolPlatform } from '../../types';
 import { platformBridge } from '../../services/bridge';
 import {
@@ -18,7 +18,9 @@ import {
   Info,
   ExternalLink,
   ShieldAlert,
-  ChevronRight
+  ChevronRight,
+  Layers,
+  Settings
 } from 'lucide-react';
 
 export const ToolStudioPage: React.FC = () => {
@@ -28,12 +30,14 @@ export const ToolStudioPage: React.FC = () => {
     parentCategories,
     getSubcategories,
     tags,
+    environments,
     editingToolId,
     initialStudioCategory,
     cancelEditTool,
     saveTool,
     launchTool,
-    setActiveTab
+    setActiveTab,
+    isDarkTheme,
   } = useApp();
 
   const isEditing = Boolean(editingToolId);
@@ -52,6 +56,7 @@ export const ToolStudioPage: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [openInTerminal, setOpenInTerminal] = useState(false);
   const [notes, setNotes] = useState('');
+  const [environmentId, setEnvironmentId] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
 
@@ -79,12 +84,15 @@ export const ToolStudioPage: React.FC = () => {
       setIsFavorite(targetTool.isFavorite);
       setOpenInTerminal(Boolean(targetTool.openInTerminal));
       setNotes(targetTool.notes || '');
+      setEnvironmentId(targetTool.environmentId || '');
       setSelectedTags(targetTool.tags || []);
     } else {
       // Defaults for new tool
-      setName('');
-      setDescription('');
-      setType('exe');
+      if (initialStudioCategory?.type) {
+        setType(initialStudioCategory.type);
+      } else {
+        setType('exe');
+      }
       
       if (initialStudioCategory?.categoryId) {
         const initCat = categories.find((c) => c.id === initialStudioCategory.categoryId);
@@ -95,6 +103,9 @@ export const ToolStudioPage: React.FC = () => {
           setCategoryId(initialStudioCategory.categoryId);
           setSubcategoryId(initialStudioCategory.subcategoryId || '');
         }
+      } else if (initialStudioCategory?.type === 'web' || initialStudioCategory?.type === 'cheat_sheet') {
+        setCategoryId('');
+        setSubcategoryId('');
       } else {
         setCategoryId(parentCategories[0]?.id || 'cat-1');
         setSubcategoryId('');
@@ -107,7 +118,8 @@ export const ToolStudioPage: React.FC = () => {
       setIsFavorite(false);
       setOpenInTerminal(false);
       setNotes('');
-      setSelectedTags(['recon']);
+      setEnvironmentId('');
+      setSelectedTags(initialStudioCategory?.type === 'cheat_sheet' ? ['reverse-shell'] : initialStudioCategory?.type === 'web' ? ['osint'] : ['recon']);
     }
   }, [targetTool, initialStudioCategory, parentCategories, categories]);
 
@@ -161,6 +173,7 @@ export const ToolStudioPage: React.FC = () => {
   const availableSubcategories = categoryId ? getSubcategories(categoryId) : [];
   const parentCat = categories.find((c) => c.id === categoryId);
   const subCat = subcategoryId ? categories.find((c) => c.id === subcategoryId) : null;
+  const selectedEnv = environmentId ? environments.find((e) => e.id === environmentId) || null : null;
 
   // Live draft tool object for preview
   const livePreviewTool: Tool = {
@@ -168,8 +181,8 @@ export const ToolStudioPage: React.FC = () => {
     name: name || '工具名称预览',
     description: description || '这里将展示工具的功能简介与应用场景...',
     type,
-    categoryId: categoryId || parentCategories[0]?.id || 'cat-1',
-    subcategoryId: subcategoryId || undefined,
+    categoryId: categoryId || (type === 'web' || type === 'cheat_sheet' ? '' : (parentCategories[0]?.id || 'cat-1')),
+    subcategoryId: categoryId ? (subcategoryId || undefined) : undefined,
     tags: selectedTags,
     targetPath: targetPath || (type === 'web' ? 'https://example.com' : 'C:\\Tools\\tool.exe'),
     defaultArgs,
@@ -182,12 +195,13 @@ export const ToolStudioPage: React.FC = () => {
     updatedAt: new Date().toISOString(),
     notes,
     openInTerminal,
+    environmentId: environmentId || undefined,
   };
 
   // Readiness diagnostics
   const isPathValid = Boolean(targetPath.trim());
   const isNameValid = Boolean(name.trim());
-  const isCategoryValid = Boolean(categoryId);
+  const isCategoryValid = (type === 'web' || type === 'cheat_sheet') ? true : Boolean(categoryId);
   const readinessScore = (isNameValid ? 40 : 0) + (isPathValid ? 40 : 0) + (isCategoryValid ? 20 : 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -195,7 +209,13 @@ export const ToolStudioPage: React.FC = () => {
     if (!isNameValid || !isPathValid) return;
 
     await saveTool(livePreviewTool);
-    setActiveTab('tools');
+    if (type === 'web') {
+      setActiveTab('web-tools');
+    } else if (type === 'cheat_sheet') {
+      setActiveTab('cheat-sheets');
+    } else {
+      setActiveTab('tools');
+    }
   };
 
   return (
@@ -301,7 +321,7 @@ export const ToolStudioPage: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-[#94a3b8] mb-1">
-                  所属一级大类 *
+                  所属一级大类 {(type === 'web' || type === 'cheat_sheet') ? '(可选)' : '*'}
                 </label>
                 <select
                   value={categoryId}
@@ -311,6 +331,9 @@ export const ToolStudioPage: React.FC = () => {
                   }}
                   className="w-full bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded-lg px-3 py-2 text-xs text-[#f1f5f9] focus:outline-none"
                 >
+                  {(type === 'web' || type === 'cheat_sheet') && (
+                    <option value="">(独立资源 / 不归属战术大类)</option>
+                  )}
                   {parentCategories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name} ({c.slug})
@@ -325,8 +348,9 @@ export const ToolStudioPage: React.FC = () => {
                 </label>
                 <select
                   value={subcategoryId}
+                  disabled={!categoryId}
                   onChange={(e) => setSubcategoryId(e.target.value)}
-                  className="w-full bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded-lg px-3 py-2 text-xs text-[#f1f5f9] focus:outline-none"
+                  className="w-full bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded-lg px-3 py-2 text-xs text-[#f1f5f9] focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <option value="">(无二级子类 / 直属该大类)</option>
                   {availableSubcategories.map((s) => (
@@ -413,6 +437,82 @@ export const ToolStudioPage: React.FC = () => {
                     </button>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Runtime Environment Configuration (for exe and script) */}
+            {(type === 'exe' || type === 'script') && (
+              <div className="p-3.5 rounded-lg bg-[#0d121f] border border-[#1e293b] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-[#f1f5f9] flex items-center space-x-1.5">
+                    <Layers className="w-3.5 h-3.5 text-[#38bdf8]" />
+                    <span>专属启动运行环境 (Runtime Environment)</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('settings')}
+                    className="text-[11px] text-[#38bdf8] hover:underline flex items-center space-x-1"
+                    title="前往系统设置新增或编辑环境"
+                  >
+                    <Settings className="w-3 h-3" />
+                    <span>管理环境配置</span>
+                  </button>
+                </div>
+                <select
+                  value={environmentId}
+                  onChange={(e) => setEnvironmentId(e.target.value)}
+                  className="w-full bg-[#111827] border border-[#1e293b] focus:border-[#38bdf8] rounded-lg px-3 py-2 text-xs text-[#f1f5f9] focus:outline-none"
+                >
+                  <option value="">跟随宿主系统全局环境 (Default System PATH)</option>
+                  {environments.map((env) => (
+                    <option key={env.id} value={env.id}>
+                      {env.name} [{env.type.toUpperCase()}]{env.isDefault ? ' · 预设默认' : ''}
+                    </option>
+                  ))}
+                </select>
+
+                {selectedEnv ? (
+                  <div className="p-2.5 rounded bg-[#162032]/60 border border-[#38bdf8]/20 text-[11px] space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-[#38bdf8]/15 text-[#38bdf8] border border-[#38bdf8]/30 font-semibold">
+                          {selectedEnv.type.toUpperCase()}
+                        </span>
+                        <span className="text-[#f1f5f9] font-medium">{selectedEnv.name}</span>
+                      </div>
+                      {selectedEnv.isDefault && (
+                        <span className="text-[10px] text-emerald-400 font-mono">该类型默认环境</span>
+                      )}
+                    </div>
+                    {selectedEnv.description && (
+                      <div className="text-[#94a3b8] text-[11px]">{selectedEnv.description}</div>
+                    )}
+                    {selectedEnv.binPath && (
+                      <div className="text-[#94a3b8] font-mono text-[10px] truncate">
+                        解释器路径: <span className="text-[#38bdf8]">{selectedEnv.binPath}</span>
+                      </div>
+                    )}
+                    {selectedEnv.extraArgs && (
+                      <div className="text-[#94a3b8] font-mono text-[10px] truncate">
+                        预置附加参数: <span className="text-amber-400">{selectedEnv.extraArgs}</span>
+                      </div>
+                    )}
+                    {selectedEnv.envVars && Object.keys(selectedEnv.envVars).length > 0 && (
+                      <div className="text-[#94a3b8] font-mono text-[10px] flex items-center gap-1.5 flex-wrap">
+                        <span>注入变量:</span>
+                        {Object.entries(selectedEnv.envVars).map(([k, v]) => (
+                          <span key={k} className="px-1.5 py-0.5 rounded bg-[#0d121f] border border-[#1e293b] text-emerald-400">
+                            {k}={v}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-[#64748b]">
+                    适用于需要指定 Java 8/17、Python 2/3、WSL 子系统或强制挂载代理（如 127.0.0.1:8080）执行的工具。
+                  </p>
+                )}
               </div>
             )}
 
@@ -528,18 +628,14 @@ export const ToolStudioPage: React.FC = () => {
                     <div className="flex items-center space-x-1.5 mt-0.5">
                       {parentCat && (
                         <span
-                          className="text-[10px] px-1.5 py-0.2 rounded border flex items-center space-x-1"
-                          style={{
-                            borderColor: `${parentCat.color || '#38bdf8'}40`,
-                            color: parentCat.color || '#38bdf8',
-                            backgroundColor: `${parentCat.color || '#38bdf8'}10`,
-                          }}
+                          className="text-[10px] px-1.5 py-0.2 rounded border flex items-center space-x-1 font-mono"
+                          style={getCategoryBadgeStyle(parentCat.color, isDarkTheme)}
                         >
                           <span>{parentCat.name}</span>
                           {subCat && (
                             <>
                               <span className="opacity-60">›</span>
-                              <span className="font-semibold text-white">{subCat.name}</span>
+                              <span className="font-semibold text-slate-800 dark:text-white font-sans">{subCat.name}</span>
                             </>
                           )}
                         </span>
@@ -565,6 +661,14 @@ export const ToolStudioPage: React.FC = () => {
               <div className="px-2 py-1 rounded bg-[#111827] border border-[#1e293b] text-[11px] font-mono text-[#64748b] truncate">
                 {targetPath || '未设定启动路径'}
               </div>
+
+              {selectedEnv && (
+                <div className="flex items-center space-x-1.5 text-[10px] font-mono text-[#38bdf8] bg-[#162032] border border-[#38bdf8]/30 px-2 py-0.5 rounded">
+                  <span className="font-semibold uppercase">[{selectedEnv.type}]</span>
+                  <span>{selectedEnv.name}</span>
+                  {selectedEnv.extraArgs && <span className="text-[#64748b]">({selectedEnv.extraArgs})</span>}
+                </div>
+              )}
 
               {selectedTags.length > 0 && (
                 <div className="flex flex-wrap gap-1">

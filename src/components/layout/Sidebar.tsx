@@ -10,6 +10,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Folder,
+  Globe,
+  Bookmark,
+  ShieldAlert,
 } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
@@ -19,6 +22,7 @@ export const Sidebar: React.FC = () => {
     isSidebarCollapsed,
     toggleSidebar,
     tools,
+    pocs,
     parentCategories,
     getSubcategories,
     startAddTool,
@@ -28,6 +32,10 @@ export const Sidebar: React.FC = () => {
 
   const totalCount = tools.length;
   const favCount = tools.filter((t) => t.isFavorite).length;
+  const pocCount = pocs?.length || 0;
+  const webCount = tools.filter((t) => t.type === 'web').length;
+  const cheatSheetCount = tools.filter((t) => t.type === 'cheat_sheet').length;
+  const tacticalCategories = parentCategories.filter((c) => c.id !== 'cat-8');
 
   const navItems: {
     id: NavigationTab;
@@ -38,8 +46,10 @@ export const Sidebar: React.FC = () => {
   }[] = [
     { id: 'dashboard', label: '控制台首页', icon: LayoutDashboard, badge: favCount },
     { id: 'tools', label: '全部安全工具', icon: Layers, badge: totalCount },
-    { id: 'categories', label: '分类与标签', icon: FolderTree, badge: parentCategories.length },
-    { id: 'tool-studio', label: '添加 / 编辑工具', icon: PlusCircle, highlight: true },
+    { id: 'poc-manager', label: 'POC 漏洞管理', icon: ShieldAlert, badge: pocCount },
+    { id: 'web-tools', label: 'Web 在线工具', icon: Globe, badge: webCount },
+    { id: 'cheat-sheets', label: '渗透备忘手册', icon: Bookmark, badge: cheatSheetCount },
+    { id: 'categories', label: '分类与标签', icon: FolderTree, badge: tacticalCategories.length },
   ];
 
   const handleParentCategoryClick = (catId: string) => {
@@ -91,9 +101,7 @@ export const Sidebar: React.FC = () => {
                 key={item.id}
                 type="button"
                 onClick={() => {
-                  if (item.id === 'tool-studio') {
-                    startAddTool();
-                  } else if (item.id === 'tools') {
+                  if (item.id === 'tools') {
                     setSelectedCategoryFilter('all', null);
                     setActiveTab('tools');
                   } else {
@@ -135,12 +143,12 @@ export const Sidebar: React.FC = () => {
           <div className="flex-1 min-h-0 flex flex-col pt-3 border-t border-[#1e293b]">
             <div className="flex-shrink-0 text-xs font-semibold uppercase tracking-wider px-2.5 mb-2 flex items-center justify-between">
               <span className="tracking-wide text-[#94a3b8] font-medium">战术大类</span>
-              <span className="text-xs text-[#64748b] font-mono">{parentCategories.length} 个</span>
+              <span className="text-xs text-[#64748b] font-mono">{tacticalCategories.length} 个</span>
             </div>
 
             {/* 大类列表 (单层，无折叠展开干扰) */}
             <div className="flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin space-y-1">
-              {parentCategories.map((parent) => {
+              {tacticalCategories.map((parent) => {
                 const subcategories = getSubcategories(parent.id);
                 const subIds = subcategories.map((s) => s.id);
                 const parentToolCount = tools.filter(

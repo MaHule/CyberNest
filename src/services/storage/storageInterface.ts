@@ -1,4 +1,4 @@
-import { Tool, Category, Tag, AppSettings, ExecutionLog } from '../../types';
+import { Tool, Category, Tag, AppSettings, ExecutionLog, PocItem, ToolEnvironment } from '../../types';
 
 export interface StorageService {
   init: () => Promise<void>;
@@ -10,6 +10,21 @@ export interface StorageService {
   deleteTool: (id: string) => Promise<boolean>;
   toggleFavorite: (id: string) => Promise<boolean>;
   recordToolUsage: (id: string) => Promise<void>;
+
+  // Environments (启动环境配置管理)
+  getEnvironments: () => Promise<ToolEnvironment[]>;
+  getEnvironmentById: (id: string) => Promise<ToolEnvironment | null>;
+  saveEnvironment: (env: ToolEnvironment) => Promise<ToolEnvironment>;
+  deleteEnvironment: (id: string) => Promise<boolean>;
+  setDefaultEnvironment: (id: string) => Promise<void>;
+
+  // POCs
+  getPocs: () => Promise<PocItem[]>;
+  getPocById: (id: string) => Promise<PocItem | null>;
+  savePoc: (poc: PocItem) => Promise<PocItem>;
+  deletePoc: (id: string) => Promise<boolean>;
+  toggleFavoritePoc: (id: string) => Promise<boolean>;
+  recordPocUsage: (id: string) => Promise<void>;
 
   // Categories
   getCategories: () => Promise<Category[]>;

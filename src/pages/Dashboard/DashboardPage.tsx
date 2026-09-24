@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp, getCategoryBadgeStyle } from '../../context/AppContext';
 import {
   Wrench,
   Star,
@@ -16,13 +16,15 @@ import {
   Terminal,
   FileCode,
   Bookmark,
-  ExternalLink
+  ExternalLink,
+  ShieldAlert,
 } from 'lucide-react';
 import { Tool } from '../../types';
 
 export const DashboardPage: React.FC = () => {
   const {
     tools,
+    pocs,
     categories,
     parentCategories,
     getSubcategories,
@@ -33,7 +35,8 @@ export const DashboardPage: React.FC = () => {
     setActiveTab,
     setSelectedCategoryFilter,
     startAddTool,
-    startEditTool
+    startEditTool,
+    isDarkTheme,
   } = useApp();
 
   const [copiedSnippet, setCopiedSnippet] = useState<string | null>(null);
@@ -50,6 +53,9 @@ export const DashboardPage: React.FC = () => {
 
   const totalRuns = tools.reduce((acc, cur) => acc + (cur.usageCount || 0), 0);
   const totalSubcategories = categories.filter((c) => Boolean(c.parentId)).length;
+  const webToolsCount = tools.filter((t) => t.type === 'web').length;
+  const cheatSheetsCount = tools.filter((t) => t.type === 'cheat_sheet').length;
+  const pocsCount = pocs?.length || 0;
 
   // 4 Top Category Runways
   const topCategories = parentCategories.slice(0, 4);
@@ -129,7 +135,7 @@ export const DashboardPage: React.FC = () => {
             <FolderTree className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-[11px] text-[#94a3b8]">分类架构</div>
+            <div className="text-[11px] text-[#94a3b8]">战术分类架构</div>
             <div className="text-xl font-bold font-mono text-purple-400 flex items-baseline space-x-1">
               <span>{parentCategories.length}</span>
               <span className="text-xs text-[#94a3b8] font-normal font-sans">大类</span>
@@ -138,6 +144,87 @@ export const DashboardPage: React.FC = () => {
               <span className="text-xs text-[#94a3b8] font-normal font-sans">子类</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* 2.5 Standalone Resources Hubs (Web Tools, Cheat Sheets & POCs) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Web Tools Card */}
+        <div
+          onClick={() => setActiveTab('web-tools')}
+          className="group p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 via-transparent to-transparent border border-emerald-500/20 hover:border-emerald-500/40 transition-all cursor-pointer flex items-center justify-between"
+        >
+          <div className="flex items-center space-x-3.5">
+            <div className="w-10 h-10 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+              <Globe className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-[#f1f5f9] group-hover:text-emerald-500 transition-colors">
+                  Web 在线工具枢纽
+                </h3>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
+                  {webToolsCount} 款独立在线资源
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-[#94a3b8] mt-0.5">
+                免下载安装，一键直达情报测绘、逆向解密与安全分析在线平台
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-emerald-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+        </div>
+
+        {/* Cheat Sheets Card */}
+        <div
+          onClick={() => setActiveTab('cheat-sheets')}
+          className="group p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-transparent to-transparent border border-amber-500/20 hover:border-amber-500/40 transition-all cursor-pointer flex items-center justify-between"
+        >
+          <div className="flex items-center space-x-3.5">
+            <div className="w-10 h-10 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
+              <Bookmark className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-[#f1f5f9] group-hover:text-amber-500 transition-colors">
+                  渗透备忘手册
+                </h3>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
+                  {cheatSheetsCount} 条高频指令
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-[#94a3b8] mt-0.5">
+                提权/反弹Shell速查，支持全局攻击机 IP/Port 动态变量替换
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-amber-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+        </div>
+
+        {/* POCs Card */}
+        <div
+          onClick={() => setActiveTab('poc-manager')}
+          className="group p-4 rounded-xl bg-gradient-to-r from-rose-500/10 via-transparent to-transparent border border-rose-500/20 hover:border-rose-500/40 transition-all cursor-pointer flex items-center justify-between"
+        >
+          <div className="flex items-center space-x-3.5">
+            <div className="w-10 h-10 rounded-lg bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-105 transition-transform">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-[#f1f5f9] group-hover:text-rose-500 transition-colors">
+                  POC 漏洞验证中心
+                </h3>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400">
+                  {pocsCount} 份验证模板
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 dark:text-[#94a3b8] mt-0.5">
+                收录 CVE 探测脚本、Nuclei 规则与动态靶机参数替换验证
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-rose-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
         </div>
       </div>
 
@@ -179,7 +266,10 @@ export const DashboardPage: React.FC = () => {
                   <div className="flex items-start justify-between">
                     <div
                       className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shadow-sm"
-                      style={{ backgroundColor: `${cat.color}20`, color: cat.color }}
+                      style={{
+                        backgroundColor: `${cat.color}20`,
+                        color: getCategoryBadgeStyle(cat.color, isDarkTheme).color,
+                      }}
                     >
                       {cat.name.slice(0, 2)}
                     </div>
@@ -286,18 +376,14 @@ export const DashboardPage: React.FC = () => {
                         <div className="flex items-center space-x-1.5 mt-0.5">
                           {parentCat && (
                             <span
-                              className="text-[10px] px-1.5 py-0.5 rounded border flex items-center space-x-1"
-                              style={{
-                                borderColor: `${parentCat.color}40`,
-                                color: parentCat.color,
-                                backgroundColor: `${parentCat.color}10`
-                              }}
+                              className="text-[10px] px-1.5 py-0.5 rounded border flex items-center space-x-1 font-mono"
+                              style={getCategoryBadgeStyle(parentCat.color, isDarkTheme)}
                             >
                               <span>{parentCat.name}</span>
                               {subCat && (
                                 <>
                                   <span className="opacity-40 text-[9px]">›</span>
-                                  <span className="font-medium text-white/90">{subCat.name}</span>
+                                  <span className="font-medium text-slate-800 dark:text-white/90 font-sans">{subCat.name}</span>
                                 </>
                               )}
                             </span>
@@ -432,8 +518,16 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-3 text-[11px] text-[#64748b]">
-            可修改右上方 LHOST / PORT 参数，点击右侧图标直接复制注入 Payload。
+          <div className="mt-3 text-[11px] text-[#64748b] flex items-center justify-between">
+            <span>可修改右上方 LHOST / PORT 参数，点击右侧图标直接复制注入 Payload。</span>
+            <button
+              type="button"
+              onClick={() => setActiveTab('cheat-sheets')}
+              className="text-[#38bdf8] hover:underline flex items-center space-x-1 flex-shrink-0"
+            >
+              <span>查看全部渗透备忘手册</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
           </div>
         </div>
 

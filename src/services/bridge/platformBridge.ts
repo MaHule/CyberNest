@@ -1,4 +1,4 @@
-import { Tool } from '../../types';
+import { Tool, ToolEnvironment } from '../../types';
 
 export interface ExecutionResult {
   success: boolean;
@@ -10,7 +10,8 @@ export interface ExecutionResult {
 export interface PlatformBridge {
   isTauri: () => boolean;
   openExternalUrl: (url: string) => Promise<boolean>;
-  executeTool: (tool: Tool, customArgs?: string) => Promise<ExecutionResult>;
+  executeTool: (tool: Tool, customArgs?: string, env?: ToolEnvironment | null) => Promise<ExecutionResult>;
+  openTerminal: (command: string) => Promise<ExecutionResult>;
   selectFile: (filters?: { name: string; extensions: string[] }[]) => Promise<string | null>;
   selectDirectory: () => Promise<string | null>;
   copyToClipboard: (text: string) => Promise<boolean>;
@@ -41,9 +42,8 @@ class DesktopPlatformBridge implements PlatformBridge {
     }
   }
 
-  async executeTool(tool: Tool, customArgs?: string): Promise<ExecutionResult> {
+  async executeTool(tool: Tool, customArgs?: string, env?: ToolEnvironment | null): Promise<ExecutionResult> {
     const finalArgs = customArgs || tool.defaultArgs || '';
-    const fullCommand = `${tool.targetPath} ${finalArgs}`.trim();
 
     if (tool.type === 'web') {
       await this.openExternalUrl(tool.targetPath);
@@ -63,41 +63,113 @@ class DesktopPlatformBridge implements PlatformBridge {
       };
     }
 
+    // 根据配置的环境构造包装执行命令与参数
+    let binary = tool.targetPath;
+    let cmdArgs: string[] = [];
+    let fullCommand = '';
+
+    if (env) {
+      const extraArgs = env.extraArgs ? env.extraArgs.trim().split(/\s+/).filter(Boolean) : [];
+      if (env.type === 'java' || tool.targetPath.toLowerCase().endsWith('.jar')) {
+        const javaBin = env.binPath || 'java';
+        binary = javaBin;
+        cmdArgs = [...extraArgs, '-jar', tool.targetPath, ...(finalArgs ? finalArgs.split(/\s+/).filter(Boolean) : [])];
+        fullCommand = `"${binary}" ${extraArgs.join(' ')} -jar "${tool.targetPath}" ${finalArgs}`.trim();
+      } else if (env.type === 'python' || tool.targetPath.toLowerCase().endsWith('.py')) {
+        const pyBin = env.binPath || 'python';
+        binary = pyBin;
+        cmdArgs = [...extraArgs, tool.targetPath, ...(finalArgs ? finalArgs.split(/\s+/).filter(Boolean) : [])];
+        fullCommand = `"${binary}" ${extraArgs.join(' ')} "${tool.targetPath}" ${finalArgs}`.trim();
+      } else if (env.binPath) {
+        binary = env.binPath;
+        cmdArgs = [...extraArgs, tool.targetPath, ...(finalArgs ? finalArgs.split(/\s+/).filter(Boolean) : [])];
+        fullCommand = `"${binary}" ${extraArgs.join(' ')} "${tool.targetPath}" ${finalArgs}`.trim();
+      } else {
+        cmdArgs = finalArgs ? finalArgs.split(/\s+/).filter(Boolean) : [];
+        fullCommand = `${tool.targetPath} ${finalArgs}`.trim();
+      }
+    } else {
+      cmdArgs = finalArgs ? finalArgs.split(/\s+/).filter(Boolean) : [];
+      fullCommand = `${tool.targetPath} ${finalArgs}`.trim();
+    }
+
+    // 注入环境变量前缀 (如 HTTP_PROXY, JAVA_HOME 等)
+    let envPrefix = '';
+    if (env?.envVars && Object.keys(env.envVars).length > 0) {
+      envPrefix = Object.entries(env.envVars)
+        .map(([k, v]) => `set ${k}=${v}`)
+        .join(' && ') + ' && ';
+    }
+
     if (this.isTauri()) {
       try {
         const { Command } = await import('@tauri-apps/plugin-shell');
         
-        if (tool.openInTerminal) {
-          const terminalCommand = Command.create('wt', [
-            '-p', 'Command Prompt',
-            'cmd', '/k',
-            `"${tool.targetPath}" ${finalArgs}`
+        if (tool.openInTerminal || envPrefix) {
+          const terminalExecStr = `${envPrefix}${fullCommand}`;
+          const terminalCommand = Command.create('cmd', [
+            '/c', 'start', 'cmd', '/k',
+            terminalExecStr
           ]);
           await terminalCommand.spawn();
         } else {
-          const cmd = Command.create(tool.targetPath, finalArgs ? finalArgs.split(' ') : []);
+          const cmd = Command.create(binary, cmdArgs);
           await cmd.spawn();
         }
 
+        const envNotice = env ? ` (已加载环境: ${env.name})` : '';
         return {
           success: true,
-          message: `已成功启动本地安全工具: ${tool.name}`,
-          commandExecuted: fullCommand,
+          message: `已成功启动本地安全工具: ${tool.name}${envNotice}`,
+          commandExecuted: envPrefix + fullCommand,
         };
       } catch (err) {
         console.error('[PlatformBridge] Local execution failed:', err);
         return {
           success: false,
           message: `启动失败: ${err instanceof Error ? err.message : String(err)}`,
-          commandExecuted: fullCommand,
+          commandExecuted: envPrefix + fullCommand,
         };
       }
     } else {
-      console.log(`[PlatformBridge (Web Mock)] Executed: ${fullCommand}`);
+      console.log(`[PlatformBridge (Web Mock)] Executed: ${envPrefix}${fullCommand}`);
+      const envNotice = env ? ` [环境: ${env.name}]` : '';
       return {
         success: true,
-        message: `[开发环境模拟调用] ${tool.name}: ${fullCommand}`,
-        commandExecuted: fullCommand,
+        message: `[开发环境模拟调用] ${tool.name}${envNotice}: ${envPrefix}${fullCommand}`,
+        commandExecuted: envPrefix + fullCommand,
+      };
+    }
+  }
+
+  async openTerminal(command: string): Promise<ExecutionResult> {
+    if (this.isTauri()) {
+      try {
+        const { Command } = await import('@tauri-apps/plugin-shell');
+        const terminalCommand = Command.create('cmd', [
+          '/c', 'start', 'cmd', '/k', command
+        ]);
+        await terminalCommand.spawn();
+        return {
+          success: true,
+          message: `已在独立终端中执行指令`,
+          commandExecuted: command,
+        };
+      } catch (err) {
+        console.error('[PlatformBridge] Terminal launch failed:', err);
+        return {
+          success: false,
+          message: `启动终端失败: ${err instanceof Error ? err.message : String(err)}`,
+          commandExecuted: command,
+        };
+      }
+    } else {
+      console.log(`[PlatformBridge (Web Mock)] Open terminal with command: ${command}`);
+      await this.copyToClipboard(command);
+      return {
+        success: true,
+        message: `[Web 预览模式] 指令已复制到剪贴板: ${command}`,
+        commandExecuted: command,
       };
     }
   }

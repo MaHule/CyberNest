@@ -5,6 +5,9 @@ import { DashboardPage } from './pages/Dashboard/DashboardPage';
 import { AllToolsPage } from './pages/AllTools/AllToolsPage';
 import { CategoriesPage } from './pages/Categories/CategoriesPage';
 import { ToolStudioPage } from './pages/ToolStudio/ToolStudioPage';
+import { WebToolsPage } from './pages/WebTools/WebToolsPage';
+import { CheatSheetsPage } from './pages/CheatSheets/CheatSheetsPage';
+import { PocManagerPage } from './pages/PocManager/PocManagerPage';
 import { SettingsPage } from './pages/Settings/SettingsPage';
 
 const MainViewRouter: React.FC = () => {
@@ -26,6 +29,12 @@ const MainViewRouter: React.FC = () => {
       return <DashboardPage />;
     case 'tools':
       return <AllToolsPage />;
+    case 'web-tools':
+      return <WebToolsPage />;
+    case 'cheat-sheets':
+      return <CheatSheetsPage />;
+    case 'poc-manager':
+      return <PocManagerPage />;
     case 'categories':
       return <CategoriesPage />;
     case 'tool-studio':

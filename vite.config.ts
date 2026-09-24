@@ -17,8 +17,8 @@ export default defineConfig({
     strictPort: true,
     host: false,
     watch: {
-      // 3. tell vite to ignore watching src-tauri
-      ignored: ["**/src-tauri/**"],
+      // Ignore src-tauri and Windows temporary/lock files
+      ignored: ["**/src-tauri/**", "**/*.TMP", "**/*.tmp", "**/*.crswap", "**/~*"],
     },
   },
   envPrefix: ["VITE_", "TAURI_ENV_*"],

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useApp, ACCENT_PRESETS } from '../../context/AppContext';
-import { ThemeMode } from '../../types';
+import { ThemeMode, ToolEnvironment, EnvironmentType } from '../../types';
 import { storageService } from '../../services/storage';
+import { platformBridge } from '../../services/bridge';
 import {
   Settings,
   Moon,
@@ -16,13 +17,235 @@ import {
   Keyboard,
   Cpu,
   Check,
-  AlertCircle
+  AlertCircle,
+  Layers,
+  Plus,
+  Trash2,
+  Edit2,
+  FolderOpen,
+  Coffee,
+  FileCode,
+  Shield,
+  X,
+  Globe
 } from 'lucide-react';
 
+const QUICK_ENV_PRESETS: Array<{
+  label: string;
+  preset: Omit<ToolEnvironment, 'id' | 'createdAt' | 'updatedAt'>;
+}> = [
+  {
+    label: '+ Java 8 (JRE 1.8)',
+    preset: {
+      name: 'Java 8 (JRE 1.8)',
+      type: 'java',
+      binPath: 'java',
+      extraArgs: '-Xmx2g -Dfile.encoding=UTF-8',
+      description: '经典 Java 8 兼容运行时，支持旧版 Sqlmap-GUI、反序列化利用工具',
+      isDefault: false,
+    },
+  },
+  {
+    label: '+ Java 17/21 LTS',
+    preset: {
+      name: 'Java 17/21 LTS',
+      type: 'java',
+      binPath: 'java',
+      extraArgs: '-Dfile.encoding=UTF-8',
+      description: '现代化高版本 Java LTS 环境，兼容最新 Burp Suite 与 Ghidra',
+      isDefault: false,
+    },
+  },
+  {
+    label: '+ Python 3.x',
+    preset: {
+      name: 'Python 3.x (默认)',
+      type: 'python',
+      binPath: 'python',
+      extraArgs: '-u',
+      description: '标准 Python 3 安全脚本执行环境',
+      isDefault: false,
+    },
+  },
+  {
+    label: '+ Python 2.7',
+    preset: {
+      name: 'Python 2.7 (Legacy)',
+      type: 'python',
+      binPath: 'python2',
+      extraArgs: '-u',
+      description: '专用于执行历史遗留 Exploit 与反编译分析工具',
+      isDefault: false,
+    },
+  },
+  {
+    label: '+ Burp 本地代理 (8080)',
+    preset: {
+      name: 'Burp 本地代理环境',
+      type: 'proxy',
+      envVars: {
+        HTTP_PROXY: 'http://127.0.0.1:8080',
+        HTTPS_PROXY: 'http://127.0.0.1:8080',
+      },
+      description: '注入 HTTP/HTTPS 代理变量，流量全部通过本地 Burp 监听端口转发',
+      isDefault: false,
+    },
+  },
+  {
+    label: '+ SOCKS5 代理 (10808)',
+    preset: {
+      name: 'SOCKS5 隧道代理 (10808)',
+      type: 'proxy',
+      envVars: {
+        ALL_PROXY: 'socks5://127.0.0.1:10808',
+      },
+      description: '注入全局 SOCKS5 代理隧道变量，实现安全扫描流量穿透',
+      isDefault: false,
+    },
+  },
+];
+
 export const SettingsPage: React.FC = () => {
-  const { settings, updateSettings, resetToDefaults, addToast } = useApp();
+  const {
+    settings,
+    updateSettings,
+    resetToDefaults,
+    addToast,
+    environments,
+    saveEnvironment,
+    deleteEnvironment,
+    setDefaultEnvironment,
+  } = useApp();
 
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+
+  // Environment management states
+  const [isEnvModalOpen, setIsEnvModalOpen] = useState(false);
+  const [editingEnvId, setEditingEnvId] = useState<string | null>(null);
+  const [envName, setEnvName] = useState('');
+  const [envType, setEnvType] = useState<EnvironmentType>('java');
+  const [envBinPath, setEnvBinPath] = useState('');
+  const [envExtraArgs, setEnvExtraArgs] = useState('');
+  const [envDescription, setEnvDescription] = useState('');
+  const [envIsDefault, setEnvIsDefault] = useState(false);
+  const [envVarsList, setEnvVarsList] = useState<{ key: string; value: string }[]>([]);
+
+  const handleOpenAddEnv = () => {
+    setEditingEnvId(null);
+    setEnvName('');
+    setEnvType('java');
+    setEnvBinPath('');
+    setEnvExtraArgs('');
+    setEnvDescription('');
+    setEnvIsDefault(false);
+    setEnvVarsList([]);
+    setIsEnvModalOpen(true);
+  };
+
+  const handleOpenEditEnv = (env: ToolEnvironment) => {
+    setEditingEnvId(env.id);
+    setEnvName(env.name);
+    setEnvType(env.type);
+    setEnvBinPath(env.binPath || '');
+    setEnvExtraArgs(env.extraArgs || '');
+    setEnvDescription(env.description || '');
+    setEnvIsDefault(Boolean(env.isDefault));
+    setEnvVarsList(
+      env.envVars
+        ? Object.entries(env.envVars).map(([key, value]) => ({ key, value }))
+        : []
+    );
+    setIsEnvModalOpen(true);
+  };
+
+  const handleBrowseEnvBin = async () => {
+    let extensions = ['exe', 'bat', 'cmd', 'sh', '*'];
+    if (envType === 'java') {
+      extensions = ['exe', 'bat', 'cmd', '*'];
+    } else if (envType === 'python') {
+      extensions = ['exe', 'bat', 'cmd', 'sh', '*'];
+    }
+    const picked = await platformBridge.selectFile([
+      { name: '解释器或执行程序', extensions },
+      { name: '所有文件', extensions: ['*'] },
+    ]);
+    if (picked) {
+      setEnvBinPath(picked);
+    }
+  };
+
+  const handleAddEnvVarRow = (initialKey = '', initialVal = '') => {
+    setEnvVarsList([...envVarsList, { key: initialKey, value: initialVal }]);
+  };
+
+  const handleUpdateEnvVarRow = (index: number, key: string, value: string) => {
+    const next = [...envVarsList];
+    next[index] = { key, value };
+    setEnvVarsList(next);
+  };
+
+  const handleRemoveEnvVarRow = (index: number) => {
+    setEnvVarsList(envVarsList.filter((_, i) => i !== index));
+  };
+
+  const handleSaveEnv = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!envName.trim()) return;
+
+    const envVarsRecord: Record<string, string> = {};
+    envVarsList.forEach(({ key, value }) => {
+      const k = key.trim();
+      if (k) {
+        envVarsRecord[k] = value.trim();
+      }
+    });
+
+    const now = new Date().toISOString();
+    const envPayload: ToolEnvironment = {
+      id: editingEnvId || `env_${Date.now().toString(36)}`,
+      name: envName.trim(),
+      type: envType,
+      binPath: envBinPath.trim() || undefined,
+      extraArgs: envExtraArgs.trim() || undefined,
+      envVars: Object.keys(envVarsRecord).length > 0 ? envVarsRecord : undefined,
+      description: envDescription.trim() || undefined,
+      isDefault: envIsDefault,
+      createdAt: editingEnvId ? (environments.find((e) => e.id === editingEnvId)?.createdAt || now) : now,
+      updatedAt: now,
+    };
+
+    await saveEnvironment(envPayload);
+    if (envIsDefault) {
+      await setDefaultEnvironment(envPayload.id);
+    }
+    setIsEnvModalOpen(false);
+  };
+
+  const handleQuickAddPreset = async (preset: Omit<ToolEnvironment, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const now = new Date().toISOString();
+    const newEnv: ToolEnvironment = {
+      ...preset,
+      id: `env_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await saveEnvironment(newEnv);
+  };
+
+  const getEnvIcon = (type: EnvironmentType) => {
+    switch (type) {
+      case 'java':
+        return <Coffee className="w-4 h-4 text-amber-400" />;
+      case 'python':
+        return <FileCode className="w-4 h-4 text-emerald-400" />;
+      case 'proxy':
+        return <Shield className="w-4 h-4 text-[#38bdf8]" />;
+      case 'wsl':
+        return <Terminal className="w-4 h-4 text-purple-400" />;
+      default:
+        return <Cpu className="w-4 h-4 text-[#38bdf8]" />;
+    }
+  };
 
   const handleThemeChange = (mode: ThemeMode) => {
     updateSettings({ theme: mode });
@@ -253,7 +476,158 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 4. Data Management Section */}
+      {/* 4. Tool Runtime Environment Management Section */}
+      <div className="p-5 rounded-xl bg-[#111827] border border-[#1e293b] space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <h2 className="text-sm font-semibold text-[#f1f5f9] flex items-center space-x-2">
+              <Layers className="w-4 h-4 text-[#38bdf8]" />
+              <span>工具启动环境配置管理</span>
+            </h2>
+            <p className="text-xs text-[#94a3b8] mt-1">
+              为 Java JAR、Python 脚本或本地代理工具配置独立的运行时环境（如不同 Java / Python 版本、专用网络代理与启动参数）
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleOpenAddEnv}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#38bdf8]/10 hover:bg-[#38bdf8]/20 border border-[#38bdf8]/30 text-xs text-[#38bdf8] font-medium transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>新建运行环境</span>
+          </button>
+        </div>
+
+        {/* Quick Presets Bar */}
+        <div className="p-3 rounded-lg bg-[#0d121f] border border-[#1e293b] space-y-2">
+          <div className="text-[11px] font-medium text-[#cbd5e1] flex items-center justify-between">
+            <span>常用运行环境快速添加 (点击直接合入)</span>
+            <span className="text-[10px] text-[#64748b] font-mono">QUICK PRESETS</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {QUICK_ENV_PRESETS.map((p, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => handleQuickAddPreset(p.preset)}
+                className="px-2.5 py-1 rounded bg-[#111827] hover:bg-[#162032] border border-[#1e293b] hover:border-[#38bdf8]/40 text-xs text-[#94a3b8] hover:text-[#38bdf8] transition-all font-mono"
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Registered Environments List */}
+        <div className="space-y-2.5">
+          {environments.length === 0 ? (
+            <div className="p-6 rounded-lg bg-[#0d121f] border border-[#1e293b] text-center text-xs text-[#64748b]">
+              暂无已配置的独立运行环境，点击上方按钮或预设快速添加。
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {environments.map((env) => {
+                return (
+                  <div
+                    key={env.id}
+                    className="p-3.5 rounded-lg bg-[#0d121f] border border-[#1e293b] hover:border-[#38bdf8]/30 transition-all flex flex-col justify-between space-y-3"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className="p-1.5 rounded bg-[#162032] border border-[#1e293b]">
+                            {getEnvIcon(env.type)}
+                          </div>
+                          <div>
+                            <div className="text-xs font-semibold text-[#f1f5f9] flex items-center space-x-1.5">
+                              <span>{env.name}</span>
+                              {env.isDefault && (
+                                <span className="px-1.5 py-0.2 rounded text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono">
+                                  默认
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[10px] text-[#64748b] font-mono uppercase mt-0.5">
+                              类型: {env.type}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-1">
+                          {!env.isDefault && (
+                            <button
+                              type="button"
+                              onClick={() => setDefaultEnvironment(env.id)}
+                              className="px-2 py-0.8 rounded text-[10px] bg-[#111827] hover:bg-[#162032] border border-[#1e293b] text-[#94a3b8] hover:text-[#38bdf8] transition-colors"
+                              title="设为此类别的默认环境"
+                            >
+                              设为默认
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditEnv(env)}
+                            className="p-1 rounded text-[#94a3b8] hover:text-[#38bdf8] hover:bg-[#162032] transition-colors"
+                            title="编辑环境配置"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteEnvironment(env.id)}
+                            className="p-1 rounded text-[#94a3b8] hover:text-rose-400 hover:bg-[#162032] transition-colors"
+                            title="删除环境配置"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {env.description && (
+                        <p className="text-[11px] text-[#94a3b8] line-clamp-2">
+                          {env.description}
+                        </p>
+                      )}
+
+                      {/* Detail Tags */}
+                      <div className="space-y-1 text-[11px] font-mono pt-1 border-t border-[#1e293b]">
+                        {env.binPath && (
+                          <div className="text-[#64748b] truncate">
+                            <span className="text-[#94a3b8]">解释器:</span>{' '}
+                            <span className="text-[#38bdf8]">{env.binPath}</span>
+                          </div>
+                        )}
+                        {env.extraArgs && (
+                          <div className="text-[#64748b] truncate">
+                            <span className="text-[#94a3b8]">附加参数:</span>{' '}
+                            <span className="text-amber-400">{env.extraArgs}</span>
+                          </div>
+                        )}
+                        {env.envVars && Object.keys(env.envVars).length > 0 && (
+                          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                            <span className="text-[#94a3b8] text-[10px]">环境变量:</span>
+                            {Object.entries(env.envVars).map(([k, v]) => (
+                              <span
+                                key={k}
+                                className="px-1.5 py-0.2 rounded text-[10px] bg-[#162032] border border-[#1e293b] text-emerald-400 truncate max-w-[200px]"
+                                title={`${k}=${v}`}
+                              >
+                                {k}={v}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 5. Data Management Section */}
       <div className="p-5 rounded-xl bg-[#111827] border border-[#1e293b] space-y-4">
         <h2 className="text-sm font-semibold text-[#f1f5f9] flex items-center space-x-2">
           <Terminal className="w-4 h-4 text-[#38bdf8]" />
@@ -353,7 +727,7 @@ export const SettingsPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsResetConfirmOpen(false)}
-                className="px-3 py-1.5 rounded-lg border border-[#1e293b] text-xs text-[#94a3b8] hover:text-white"
+                className="px-3 py-1.5 rounded-lg border border-[#1e293b] text-xs text-[#94a3b8] hover:text-slate-900 dark:hover:text-white"
               >
                 取消
               </button>
@@ -368,6 +742,247 @@ export const SettingsPage: React.FC = () => {
                 确定重置
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add / Edit Environment Modal */}
+      {isEnvModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-[#111827] border border-[#1e293b] rounded-xl p-5 max-w-lg w-full space-y-4 shadow-2xl my-8">
+            <div className="flex items-center justify-between pb-3 border-b border-[#1e293b]">
+              <div className="flex items-center space-x-2">
+                <Layers className="w-4 h-4 text-[#38bdf8]" />
+                <h3 className="font-semibold text-sm text-[#f1f5f9]">
+                  {editingEnvId ? '编辑启动运行环境' : '新增独立运行环境'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEnvModalOpen(false)}
+                className="text-[#94a3b8] hover:text-[#f1f5f9] p-1 rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEnv} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-medium text-[#cbd5e1] mb-1">
+                  环境名称 *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={envName}
+                  onChange={(e) => setEnvName(e.target.value)}
+                  placeholder="例如: Java 8 (Oracle JDK) 或 Burp 本地代理"
+                  className="w-full bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded-lg px-3 py-2 text-[#f1f5f9] placeholder-[#64748b] focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-medium text-[#cbd5e1] mb-1">
+                    环境类型 *
+                  </label>
+                  <select
+                    value={envType}
+                    onChange={(e) => setEnvType(e.target.value as EnvironmentType)}
+                    className="w-full bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded-lg px-2.5 py-2 text-[#f1f5f9] focus:outline-none"
+                  >
+                    <option value="java">Java 运行时 (JAR封装)</option>
+                    <option value="python">Python 解释器 (脚本封装)</option>
+                    <option value="proxy">网络代理注入 (HTTP/SOCKS5)</option>
+                    <option value="wsl">WSL 2 Linux 容器</option>
+                    <option value="custom">自定义可执行环境</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-medium text-[#cbd5e1] mb-1">
+                    默认环境设定
+                  </label>
+                  <label className="flex items-center space-x-2 pt-2 cursor-pointer text-[#cbd5e1]">
+                    <input
+                      type="checkbox"
+                      checked={envIsDefault}
+                      onChange={(e) => setEnvIsDefault(e.target.checked)}
+                      className="rounded bg-[#0d121f] border-[#1e293b] text-[#0284c7] focus:ring-0 w-4 h-4"
+                    />
+                    <span>设为该类型的默认推荐环境</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Binary / Interpreter Path */}
+              <div>
+                <label className="block font-medium text-[#cbd5e1] mb-1">
+                  解释器 / 执行程序完整路径 (可选)
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={envBinPath}
+                    onChange={(e) => setEnvBinPath(e.target.value)}
+                    placeholder={
+                      envType === 'java'
+                        ? 'C:\\Program Files\\Java\\jdk1.8.0_202\\bin\\java.exe'
+                        : envType === 'python'
+                        ? 'C:\\Python310\\python.exe'
+                        : '留空则从系统 PATH 中自动搜寻'
+                    }
+                    className="flex-1 bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded-lg px-3 py-2 font-mono text-[#f1f5f9] placeholder-[#64748b] focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleBrowseEnvBin}
+                    className="px-3 py-2 rounded-lg bg-[#162032] hover:bg-[#1e293b] border border-[#1e293b] text-[#38bdf8] flex items-center space-x-1.5 flex-shrink-0"
+                  >
+                    <FolderOpen className="w-3.5 h-3.5" />
+                    <span>浏览文件</span>
+                  </button>
+                </div>
+                <p className="text-[11px] text-[#64748b] mt-1">
+                  若填入具体路径，CyberNest 将直接使用该路径调用二进制程序；若留空则使用该类型的默认命令。
+                </p>
+              </div>
+
+              {/* Extra Arguments */}
+              <div>
+                <label className="block font-medium text-[#cbd5e1] mb-1">
+                  预置附加参数 (可选)
+                </label>
+                <input
+                  type="text"
+                  value={envExtraArgs}
+                  onChange={(e) => setEnvExtraArgs(e.target.value)}
+                  placeholder={
+                    envType === 'java'
+                      ? '-Xmx4g -Dfile.encoding=utf-8'
+                      : envType === 'python'
+                      ? '-u'
+                      : ''
+                  }
+                  className="w-full bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded-lg px-3 py-2 font-mono text-[#f1f5f9] placeholder-[#64748b] focus:outline-none"
+                />
+              </div>
+
+              {/* Custom Environment Variables Editor */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-medium text-[#cbd5e1]">
+                    自定义环境变量注入 (ENV VARS)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => handleAddEnvVarRow()}
+                    className="text-[11px] text-[#38bdf8] hover:underline flex items-center space-x-1"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>添加变量</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1.5 flex-wrap text-[10px]">
+                  <span className="text-[#64748b]">快捷填充:</span>
+                  <button
+                    type="button"
+                    onClick={() => handleAddEnvVarRow('HTTP_PROXY', 'http://127.0.0.1:8080')}
+                    className="px-1.5 py-0.5 rounded bg-[#0d121f] border border-[#1e293b] text-[#38bdf8] hover:bg-[#162032]"
+                  >
+                    HTTP_PROXY
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAddEnvVarRow('HTTPS_PROXY', 'http://127.0.0.1:8080')}
+                    className="px-1.5 py-0.5 rounded bg-[#0d121f] border border-[#1e293b] text-[#38bdf8] hover:bg-[#162032]"
+                  >
+                    HTTPS_PROXY
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAddEnvVarRow('ALL_PROXY', 'socks5://127.0.0.1:10808')}
+                    className="px-1.5 py-0.5 rounded bg-[#0d121f] border border-[#1e293b] text-[#38bdf8] hover:bg-[#162032]"
+                  >
+                    ALL_PROXY
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAddEnvVarRow('JAVA_HOME', 'C:\\Program Files\\Java\\jdk-17')}
+                    className="px-1.5 py-0.5 rounded bg-[#0d121f] border border-[#1e293b] text-amber-400 hover:bg-[#162032]"
+                  >
+                    JAVA_HOME
+                  </button>
+                </div>
+
+                {envVarsList.length > 0 ? (
+                  <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                    {envVarsList.map((row, idx) => (
+                      <div key={idx} className="flex items-center space-x-2">
+                        <input
+                          type="text"
+                          value={row.key}
+                          onChange={(e) => handleUpdateEnvVarRow(idx, e.target.value, row.value)}
+                          placeholder="KEY (如 HTTP_PROXY)"
+                          className="w-1/3 bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded px-2 py-1.5 font-mono text-[#f1f5f9] focus:outline-none text-[11px]"
+                        />
+                        <span className="text-[#64748b] font-mono">=</span>
+                        <input
+                          type="text"
+                          value={row.value}
+                          onChange={(e) => handleUpdateEnvVarRow(idx, row.key, e.target.value)}
+                          placeholder="VALUE (如 http://127.0.0.1:8080)"
+                          className="flex-1 bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded px-2 py-1.5 font-mono text-[#f1f5f9] focus:outline-none text-[11px]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveEnvVarRow(idx)}
+                          className="p-1 rounded text-[#94a3b8] hover:text-rose-400"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-2.5 rounded bg-[#0d121f] border border-[#1e293b] text-[11px] text-[#64748b] text-center">
+                    未配置注入环境变量。如需代理或 PATH 替换可在此添加。
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block font-medium text-[#cbd5e1] mb-1">
+                  用途说明 (可选)
+                </label>
+                <textarea
+                  rows={2}
+                  value={envDescription}
+                  onChange={(e) => setEnvDescription(e.target.value)}
+                  placeholder="例如: 专用于运行各类历史 Java 8 反序列化漏洞利用脚本..."
+                  className="w-full bg-[#0d121f] border border-[#1e293b] focus:border-[#38bdf8] rounded-lg px-3 py-2 text-[#f1f5f9] placeholder-[#64748b] focus:outline-none text-xs"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end space-x-2 pt-3 border-t border-[#1e293b]">
+                <button
+                  type="button"
+                  onClick={() => setIsEnvModalOpen(false)}
+                  className="px-3.5 py-1.5 rounded-lg border border-[#1e293b] text-xs text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#162032] transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-1.5 rounded-lg bg-[#0284c7] hover:bg-[#0369a1] text-xs text-white font-medium shadow-sm transition-colors"
+                >
+                  保存环境配置
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

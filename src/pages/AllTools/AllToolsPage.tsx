@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { useApp, getCategoryBadgeStyle } from '../../context/AppContext';
 import { Tool, ToolType } from '../../types';
 import {
   Search,
@@ -41,7 +41,8 @@ export const AllToolsPage: React.FC = () => {
     toggleFavorite,
     deleteTool,
     startAddTool,
-    startEditTool
+    startEditTool,
+    isDarkTheme,
   } = useApp();
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -202,13 +203,13 @@ export const AllToolsPage: React.FC = () => {
                 {activeSubCat && (
                   <>
                     <span className="opacity-50">›</span>
-                    <span className="font-semibold text-white">{activeSubCat.name}</span>
+                    <span className="font-semibold text-slate-800 dark:text-white font-sans">{activeSubCat.name}</span>
                   </>
                 )}
                 <button
                   type="button"
                   onClick={() => setSelectedCategoryFilter('all', null)}
-                  className="hover:text-white ml-0.5"
+                  className="hover:text-slate-900 dark:hover:text-white ml-0.5"
                   title="清除分类筛选"
                 >
                   <X className="w-3 h-3" />
@@ -222,7 +223,7 @@ export const AllToolsPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setSelectedTagFilter(null)}
-                  className="hover:text-white"
+                  className="hover:text-slate-900 dark:hover:text-white"
                   title="清除标签筛选"
                 >
                   <X className="w-3 h-3" />
@@ -429,26 +430,30 @@ export const AllToolsPage: React.FC = () => {
                         </h3>
                         {/* Category Breadcrumb Badge */}
                         <div className="flex items-center space-x-1.5 mt-0.5">
-                          {parentCat && (
+                          {parentCat ? (
                             <span
                               className="text-[10px] px-1.5 py-0.2 rounded border flex items-center space-x-1 font-mono"
-                              style={{
-                                borderColor: `${parentCat.color}40`,
-                                color: parentCat.color,
-                                backgroundColor: `${parentCat.color}10`
-                              }}
+                              style={getCategoryBadgeStyle(parentCat.color, isDarkTheme)}
                             >
                               <span>{parentCat.name}</span>
                               {subCat && (
                                 <>
                                   <span className="opacity-40 text-[9px]">›</span>
-                                  <span className="text-[#e2e8f0] font-medium font-sans">
+                                  <span className="text-slate-800 dark:text-[#e2e8f0] font-medium font-sans">
                                     {subCat.name}
                                   </span>
                                 </>
                               )}
                             </span>
-                          )}
+                          ) : tool.type === 'web' ? (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 font-mono">
+                              Web 在线工具
+                            </span>
+                          ) : tool.type === 'cheat_sheet' ? (
+                            <span className="text-[10px] px-1.5 py-0.2 rounded border border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 font-mono">
+                              渗透备忘手册
+                            </span>
+                          ) : null}
                           <span className="text-[10px] text-[#64748b] font-mono uppercase">
                             {tool.type}
                           </span>
@@ -592,6 +597,14 @@ export const AllToolsPage: React.FC = () => {
                             </>
                           )}
                         </div>
+                      ) : tool.type === 'web' ? (
+                        <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
+                          Web 独立工具
+                        </span>
+                      ) : tool.type === 'cheat_sheet' ? (
+                        <span className="text-[11px] text-amber-600 dark:text-amber-400 font-mono">
+                          备忘手册
+                        </span>
                       ) : (
                         <span className="text-[#64748b]">-</span>
                       )}
@@ -647,14 +660,14 @@ export const AllToolsPage: React.FC = () => {
           <div className="bg-[#111827] border border-[#1e293b] rounded-xl p-5 max-w-sm w-full space-y-4 shadow-2xl">
             <h3 className="font-semibold text-sm text-[#f1f5f9]">确认移除工具</h3>
             <p className="text-xs text-[#94a3b8]">
-              确定要删除 <strong className="text-white">“{toolToDelete.name}”</strong> 吗？
+              确定要删除 <strong className="text-slate-900 dark:text-white">“{toolToDelete.name}”</strong> 吗？
               该操作不可撤销。
             </p>
             <div className="flex items-center justify-end space-x-2 pt-2">
               <button
                 type="button"
                 onClick={() => setToolToDelete(null)}
-                className="px-3 py-1.5 rounded-lg border border-[#1e293b] text-xs text-[#94a3b8] hover:text-white"
+                className="px-3 py-1.5 rounded-lg border border-[#1e293b] text-xs text-[#94a3b8] hover:text-slate-900 dark:hover:text-white"
               >
                 取消
               </button>

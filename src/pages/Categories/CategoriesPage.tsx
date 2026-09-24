@@ -138,15 +138,15 @@ export const CategoriesPage: React.FC = () => {
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto w-full">
       {/* 1. Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#1e293b]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-[#1e293b]">
         <div>
-          <h1 className="text-xl font-bold text-[#f1f5f9] flex items-center space-x-2">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-[#f1f5f9] flex items-center space-x-2">
             <span>战术分类与标签资产池</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[#1e293b] text-[#38bdf8] font-mono">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-sky-50 dark:bg-[#1e293b] text-sky-700 dark:text-[#38bdf8] font-mono font-medium border border-sky-200 dark:border-transparent">
               Taxonomy Studio
             </span>
           </h1>
-          <p className="text-xs text-[#94a3b8] mt-1">
+          <p className="text-xs text-slate-600 dark:text-[#94a3b8] mt-1">
             支持二级树状分类体系（一级大类 + 二级子类），构建高维网安工具图谱
           </p>
         </div>
@@ -167,13 +167,13 @@ export const CategoriesPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Categories Hierarchy (7 cols ~ 58%) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="p-4 rounded-xl bg-[#111827] border border-[#1e293b] space-y-3">
+          <div className="p-4 rounded-xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1e293b] space-y-3 shadow-sm">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[#f1f5f9] flex items-center space-x-2">
-                <FolderTree className="w-4 h-4 text-[#38bdf8]" />
+              <h2 className="text-sm font-bold text-slate-900 dark:text-[#f1f5f9] flex items-center space-x-2">
+                <FolderTree className="w-4 h-4 text-[#0284c7] dark:text-[#38bdf8]" />
                 <span>核心战术分类架构</span>
               </h2>
-              <span className="text-xs font-mono text-[#94a3b8]">
+              <span className="text-xs font-mono text-slate-500 dark:text-[#94a3b8]">
                 {parentCategories.length} 个一级大类 · {totalSubcategoriesCount} 个二级子类
               </span>
             </div>
@@ -190,10 +190,10 @@ export const CategoriesPage: React.FC = () => {
                 return (
                   <div
                     key={parent.id}
-                    className="rounded-xl bg-[#0d121f] border border-[#1e293b] hover:border-[#38bdf8]/40 transition-all overflow-hidden"
+                    className="rounded-xl bg-white dark:bg-[#0d121f] border border-slate-200 dark:border-[#1e293b] hover:border-sky-500/40 dark:hover:border-[#38bdf8]/40 transition-all overflow-hidden shadow-sm"
                   >
                     {/* Parent Header Card */}
-                    <div className="p-3.5 flex items-center justify-between bg-[#131b2c]/60 border-b border-[#1e293b]/60">
+                    <div className="p-3.5 flex items-center justify-between bg-slate-50/90 dark:bg-[#131b2c]/60 border-b border-slate-200 dark:border-[#1e293b]/60">
                       <div className="flex items-center space-x-3 min-w-0">
                         <span
                           className="w-3.5 h-3.5 rounded-md flex-shrink-0 shadow-sm"
@@ -201,18 +201,18 @@ export const CategoriesPage: React.FC = () => {
                         />
                         <div className="truncate">
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-semibold text-[#f1f5f9]">
+                            <span className="text-sm font-bold text-slate-900 dark:text-[#f1f5f9]">
                               {parent.name}
                             </span>
-                            <span className="text-[11px] font-mono text-[#64748b]">
+                            <span className="text-[11px] font-mono text-slate-500 dark:text-[#64748b]">
                               /{parent.slug}
                             </span>
-                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#1e293b] text-[#94a3b8]">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#1e293b] text-slate-600 dark:text-[#94a3b8] font-mono border border-slate-200 dark:border-transparent">
                               一级大类
                             </span>
                           </div>
                           {parent.description && (
-                            <div className="text-xs text-[#94a3b8] truncate mt-0.5">
+                            <div className="text-xs text-slate-600 dark:text-[#94a3b8] truncate mt-0.5">
                               {parent.description}
                             </div>
                           )}
@@ -227,7 +227,7 @@ export const CategoriesPage: React.FC = () => {
                             setSelectedCategoryFilter(parent.id, null);
                             setActiveTab('tools');
                           }}
-                          className="text-xs font-mono px-2 py-0.5 rounded bg-[#162032] text-[#38bdf8] hover:bg-[#0284c7] hover:text-white transition-colors"
+                          className="text-xs font-mono px-2 py-1 rounded bg-sky-50 dark:bg-[#162032] text-sky-700 dark:text-[#38bdf8] border border-sky-200 dark:border-transparent hover:bg-sky-100 dark:hover:bg-[#0284c7] hover:text-sky-900 dark:hover:text-white transition-colors"
                           title="查看该大类下全部工具"
                         >
                           共 {parentToolCount} 款
@@ -236,37 +236,36 @@ export const CategoriesPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleStartAddCategory(parent.id)}
-                          className="px-2 py-1 rounded bg-[#1e293b] hover:bg-[#334155] text-white text-xs flex items-center space-x-1 transition-colors"
+                          className="px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-[#1e293b] dark:hover:bg-[#334155] text-slate-700 dark:text-white text-xs flex items-center space-x-1 border border-slate-200 dark:border-transparent transition-colors"
                           title={`在“${parent.name}”下添加子类`}
                         >
-                          <FolderPlus className="w-3 h-3 text-[#38bdf8]" />
+                          <FolderPlus className="w-3 h-3 text-[#0284c7] dark:text-[#38bdf8]" />
                           <span>+ 子类</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => handleStartEditCategory(parent)}
-                          className="p-1.5 rounded text-[#94a3b8] hover:text-white hover:bg-[#1e293b] transition-colors"
+                          className="p-1.5 rounded text-slate-400 dark:text-[#94a3b8] hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1e293b] transition-colors"
                           title="编辑分类"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
 
-                        {!parent.isSystem && (
-                          <button
-                            type="button"
-                            onClick={() => setCategoryToDelete(parent)}
-                            className="p-1.5 rounded text-[#94a3b8] hover:text-rose-400 hover:bg-[#1e293b] transition-colors"
-                            title="删除分类"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                        {/* Always allow deleting parent categories */}
+                        <button
+                          type="button"
+                          onClick={() => setCategoryToDelete(parent)}
+                          className="p-1.5 rounded text-slate-400 dark:text-[#94a3b8] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-[#1e293b] transition-colors"
+                          title="删除大类 (含其子类)"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
 
                     {/* Subcategories Branch List */}
-                    <div className="p-3 bg-[#0d121f] space-y-1.5">
+                    <div className="p-3 bg-white dark:bg-[#0d121f] space-y-1.5">
                       {subcategories.length > 0 ? (
                         subcategories.map((sub) => {
                           const subToolCount = tools.filter(
@@ -276,25 +275,25 @@ export const CategoriesPage: React.FC = () => {
                           return (
                             <div
                               key={sub.id}
-                              className="flex items-center justify-between p-2 rounded-lg bg-[#111827] border border-[#1e293b]/80 hover:border-[#38bdf8]/30 transition-all text-xs group"
+                              className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50/70 hover:bg-slate-100/70 dark:bg-[#111827] dark:hover:bg-[#162032]/60 border border-slate-200 dark:border-[#1e293b]/80 hover:border-sky-500/30 transition-all text-xs group"
                             >
                               <div className="flex items-center space-x-2.5 min-w-0">
-                                <CornerDownRight className="w-3.5 h-3.5 text-[#64748b] flex-shrink-0" />
+                                <CornerDownRight className="w-3.5 h-3.5 text-slate-400 dark:text-[#64748b] flex-shrink-0" />
                                 <span
                                   className="w-2 h-2 rounded-full flex-shrink-0"
                                   style={{ backgroundColor: sub.color || parent.color }}
                                 />
                                 <div className="truncate">
                                   <div className="flex items-center space-x-2">
-                                    <span className="font-medium text-[#e2e8f0] group-hover:text-[#38bdf8] transition-colors">
+                                    <span className="font-semibold text-slate-800 dark:text-[#e2e8f0] group-hover:text-[#0284c7] dark:group-hover:text-[#38bdf8] transition-colors">
                                       {sub.name}
                                     </span>
-                                    <span className="text-[10px] font-mono text-[#64748b]">
+                                    <span className="text-[10px] font-mono text-slate-500 dark:text-[#64748b]">
                                       /{sub.slug}
                                     </span>
                                   </div>
                                   {sub.description && (
-                                    <div className="text-[11px] text-[#64748b] truncate mt-0.5">
+                                    <div className="text-[11px] text-slate-500 dark:text-[#64748b] truncate mt-0.5">
                                       {sub.description}
                                     </div>
                                   )}
@@ -308,7 +307,7 @@ export const CategoriesPage: React.FC = () => {
                                     setSelectedCategoryFilter(parent.id, sub.id);
                                     setActiveTab('tools');
                                   }}
-                                  className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[#162032] text-[#94a3b8] hover:text-[#38bdf8] hover:bg-[#1e293b] transition-colors"
+                                  className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-[#162032] text-slate-600 dark:text-[#94a3b8] hover:text-sky-600 dark:hover:text-[#38bdf8] hover:bg-slate-200 dark:hover:bg-[#1e293b] transition-colors"
                                   title="筛选该子类工具"
                                 >
                                   {subToolCount} 款
@@ -317,7 +316,7 @@ export const CategoriesPage: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => handleStartEditCategory(sub)}
-                                  className="p-1 rounded text-[#64748b] hover:text-white hover:bg-[#1e293b]"
+                                  className="p-1 rounded text-slate-400 dark:text-[#64748b] hover:text-slate-800 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#1e293b]"
                                   title="编辑子类"
                                 >
                                   <Edit2 className="w-3 h-3" />
@@ -326,7 +325,7 @@ export const CategoriesPage: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => setCategoryToDelete(sub)}
-                                  className="p-1 rounded text-[#64748b] hover:text-rose-400 hover:bg-[#1e293b]"
+                                  className="p-1 rounded text-slate-400 dark:text-[#64748b] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-[#1e293b]"
                                   title="删除子类"
                                 >
                                   <Trash2 className="w-3 h-3" />
@@ -336,12 +335,12 @@ export const CategoriesPage: React.FC = () => {
                           );
                         })
                       ) : (
-                        <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[#111827]/40 border border-dashed border-[#1e293b] text-xs text-[#64748b]">
+                        <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-slate-50/50 dark:bg-[#111827]/40 border border-dashed border-slate-200 dark:border-[#1e293b] text-xs text-slate-500 dark:text-[#64748b]">
                           <span>当前大类暂未分子类</span>
                           <button
                             type="button"
                             onClick={() => handleStartAddCategory(parent.id)}
-                            className="text-xs text-[#38bdf8] hover:underline flex items-center space-x-1"
+                            className="text-xs text-sky-600 dark:text-[#38bdf8] hover:underline flex items-center space-x-1"
                           >
                             <Plus className="w-3 h-3" />
                             <span>立即添加子类</span>
@@ -358,10 +357,10 @@ export const CategoriesPage: React.FC = () => {
 
         {/* Right Column: Tags Asset Pool (5 cols ~ 42%) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="p-4 rounded-xl bg-[#111827] border border-[#1e293b] space-y-4">
+          <div className="p-4 rounded-xl bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1e293b] space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[#f1f5f9] flex items-center space-x-2">
-                <TagIcon className="w-4 h-4 text-emerald-400" />
+              <h2 className="text-sm font-bold text-slate-900 dark:text-[#f1f5f9] flex items-center space-x-2">
+                <TagIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>安全标签资产池 ({tags.length})</span>
               </h2>
             </div>
@@ -373,11 +372,11 @@ export const CategoriesPage: React.FC = () => {
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
                 placeholder="创建新标签 (如: red-team, poc)..."
-                className="flex-1 bg-[#0d121f] border border-[#1e293b] focus:border-emerald-500 rounded-lg px-3 py-1.5 text-xs text-[#f1f5f9] placeholder-[#64748b] focus:outline-none"
+                className="flex-1 bg-slate-50 dark:bg-[#0d121f] border border-slate-200 dark:border-[#1e293b] focus:border-emerald-500 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-[#f1f5f9] placeholder-slate-400 dark:placeholder-[#64748b] focus:outline-none transition-colors"
               />
               <button
                 type="submit"
-                className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium flex items-center space-x-1 transition-colors"
+                className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium flex items-center space-x-1 transition-colors shadow-sm"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>添加</span>
@@ -391,7 +390,7 @@ export const CategoriesPage: React.FC = () => {
                 value={tagSearch}
                 onChange={(e) => setTagSearch(e.target.value)}
                 placeholder="过滤现有标签..."
-                className="w-full bg-[#0d121f] border border-[#1e293b] rounded-lg px-3 py-1.5 text-xs text-[#f1f5f9] placeholder-[#64748b] focus:outline-none focus:border-[#38bdf8]"
+                className="w-full bg-slate-50 dark:bg-[#0d121f] border border-slate-200 dark:border-[#1e293b] rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-[#f1f5f9] placeholder-slate-400 dark:placeholder-[#64748b] focus:outline-none focus:border-sky-500 transition-colors"
               />
             </div>
 
@@ -402,7 +401,7 @@ export const CategoriesPage: React.FC = () => {
                 return (
                   <div
                     key={tag.id}
-                    className="flex items-center space-x-1.5 pl-2.5 pr-1.5 py-1 rounded-lg bg-[#0d121f] border border-[#1e293b] text-xs hover:border-[#38bdf8]/40 transition-colors group"
+                    className="flex items-center space-x-1.5 pl-2.5 pr-1.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200/80 dark:bg-[#0d121f] dark:hover:bg-[#162032] border border-slate-200 dark:border-[#1e293b] text-xs hover:border-sky-400/40 transition-colors group"
                   >
                     <button
                       type="button"
@@ -410,18 +409,18 @@ export const CategoriesPage: React.FC = () => {
                         setSelectedTagFilter(tag.name);
                         setActiveTab('tools');
                       }}
-                      className="text-[#cbd5e1] hover:text-[#38bdf8] flex items-center space-x-1"
+                      className="text-slate-700 dark:text-[#cbd5e1] hover:text-[#0284c7] dark:hover:text-[#38bdf8] flex items-center space-x-1"
                       title="查看关联工具"
                     >
                       <span className="font-mono">#{tag.name}</span>
-                      <span className="text-[10px] font-mono text-[#64748b] bg-[#162032] px-1 rounded">
+                      <span className="text-[10px] font-mono text-slate-600 dark:text-[#64748b] bg-slate-200/80 dark:bg-[#162032] px-1 rounded">
                         {count}
                       </span>
                     </button>
                     <button
                       type="button"
                       onClick={() => deleteTag(tag.id)}
-                      className="text-[#64748b] hover:text-rose-400 p-0.5 opacity-60 group-hover:opacity-100 transition-opacity"
+                      className="text-slate-400 dark:text-[#64748b] hover:text-rose-600 dark:hover:text-rose-400 p-0.5 opacity-60 group-hover:opacity-100 transition-opacity"
                       title="移除标签"
                     >
                       <X className="w-3 h-3" />
@@ -432,9 +431,9 @@ export const CategoriesPage: React.FC = () => {
             </div>
 
             {/* Taxonomy Tips */}
-            <div className="p-3 rounded-lg bg-[#0d121f] border border-[#1e293b] text-[11px] text-[#64748b] space-y-1">
-              <div className="flex items-center space-x-1.5 text-[#94a3b8] font-medium">
-                <Info className="w-3.5 h-3.5 text-[#38bdf8]" />
+            <div className="p-3 rounded-lg bg-slate-50 dark:bg-[#0d121f] border border-slate-200 dark:border-[#1e293b] text-[11px] text-slate-600 dark:text-[#64748b] space-y-1">
+              <div className="flex items-center space-x-1.5 text-slate-800 dark:text-[#94a3b8] font-medium">
+                <Info className="w-3.5 h-3.5 text-[#0284c7] dark:text-[#38bdf8]" />
                 <span>层级分类与标签使用建议</span>
               </div>
               <p>
@@ -452,10 +451,10 @@ export const CategoriesPage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <form
             onSubmit={handleSaveCategorySubmit}
-            className="bg-[#111827] border border-[#1e293b] rounded-xl p-5 max-w-md w-full space-y-4 shadow-2xl"
+            className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1e293b] rounded-xl p-5 max-w-md w-full space-y-4 shadow-2xl"
           >
-            <div className="flex items-center justify-between border-b border-[#1e293b] pb-3">
-              <h3 className="font-semibold text-sm text-[#f1f5f9]">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-[#1e293b] pb-3">
+              <h3 className="font-bold text-sm text-slate-900 dark:text-[#f1f5f9]">
                 {editingCategory
                   ? `编辑${editingCategory.parentId ? '二级子类' : '一级分类'}`
                   : catParentId
@@ -465,7 +464,7 @@ export const CategoriesPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsAddingCategory(false)}
-                className="text-[#64748b] hover:text-white"
+                className="text-slate-400 dark:text-[#64748b] hover:text-slate-900 dark:hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -474,12 +473,14 @@ export const CategoriesPage: React.FC = () => {
             <div className="space-y-3 text-xs">
               {/* Parent Category Selector */}
               <div>
-                <label className="block text-[#94a3b8] mb-1 font-medium">所属层级 / 归属大类 *</label>
+                <label className="block text-slate-700 dark:text-[#94a3b8] mb-1 font-medium">
+                  所属层级 / 归属大类 *
+                </label>
                 <select
                   value={catParentId || 'root'}
                   onChange={(e) => setCatParentId(e.target.value === 'root' ? null : e.target.value)}
                   disabled={Boolean(editingCategory && !editingCategory.parentId && getSubcategories(editingCategory.id).length > 0)}
-                  className="w-full bg-[#0d121f] border border-[#1e293b] rounded-lg px-3 py-2 text-[#f1f5f9] focus:outline-none focus:border-[#38bdf8]"
+                  className="w-full bg-slate-50 dark:bg-[#0d121f] border border-slate-200 dark:border-[#1e293b] rounded-lg px-3 py-2 text-slate-900 dark:text-[#f1f5f9] focus:outline-none focus:border-sky-500"
                 >
                   <option value="root">作为顶级一级大类 (主战术域)</option>
                   {parentCategories
@@ -491,48 +492,56 @@ export const CategoriesPage: React.FC = () => {
                     ))}
                 </select>
                 {editingCategory && !editingCategory.parentId && getSubcategories(editingCategory.id).length > 0 && (
-                  <p className="text-[10px] text-[#64748b] mt-1">
+                  <p className="text-[10px] text-slate-500 dark:text-[#64748b] mt-1">
                     当前分类下已存在子类，不可变更为子分类
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-[#94a3b8] mb-1 font-medium">分类名称 *</label>
+                <label className="block text-slate-700 dark:text-[#94a3b8] mb-1 font-medium">
+                  分类名称 *
+                </label>
                 <input
                   type="text"
                   required
                   value={catName}
                   onChange={(e) => setCatName(e.target.value)}
                   placeholder={catParentId ? '例如: 自动化接口挖掘' : '例如: 云原生与容器安全'}
-                  className="w-full bg-[#0d121f] border border-[#1e293b] rounded-lg px-3 py-2 text-[#f1f5f9] focus:outline-none focus:border-[#38bdf8]"
+                  className="w-full bg-slate-50 dark:bg-[#0d121f] border border-slate-200 dark:border-[#1e293b] rounded-lg px-3 py-2 text-slate-900 dark:text-[#f1f5f9] focus:outline-none focus:border-sky-500"
                 />
               </div>
 
               <div>
-                <label className="block text-[#94a3b8] mb-1 font-medium">URL Slug (英文别名)</label>
+                <label className="block text-slate-700 dark:text-[#94a3b8] mb-1 font-medium">
+                  URL Slug (英文别名)
+                </label>
                 <input
                   type="text"
                   value={catSlug}
                   onChange={(e) => setCatSlug(e.target.value)}
                   placeholder="例如: api-fuzzing"
-                  className="w-full bg-[#0d121f] border border-[#1e293b] rounded-lg px-3 py-2 text-[#f1f5f9] font-mono focus:outline-none focus:border-[#38bdf8]"
+                  className="w-full bg-slate-50 dark:bg-[#0d121f] border border-slate-200 dark:border-[#1e293b] rounded-lg px-3 py-2 text-slate-900 dark:text-[#f1f5f9] font-mono focus:outline-none focus:border-sky-500"
                 />
               </div>
 
               <div>
-                <label className="block text-[#94a3b8] mb-1 font-medium">描述简介</label>
+                <label className="block text-slate-700 dark:text-[#94a3b8] mb-1 font-medium">
+                  描述简介
+                </label>
                 <textarea
                   rows={2}
                   value={catDesc}
                   onChange={(e) => setCatDesc(e.target.value)}
                   placeholder="概述该分类涵盖的工具范围与测试场景..."
-                  className="w-full bg-[#0d121f] border border-[#1e293b] rounded-lg px-3 py-2 text-[#f1f5f9] focus:outline-none focus:border-[#38bdf8]"
+                  className="w-full bg-slate-50 dark:bg-[#0d121f] border border-slate-200 dark:border-[#1e293b] rounded-lg px-3 py-2 text-slate-900 dark:text-[#f1f5f9] focus:outline-none focus:border-sky-500"
                 />
               </div>
 
               <div>
-                <label className="block text-[#94a3b8] mb-1.5 font-medium">分类主题标色</label>
+                <label className="block text-slate-700 dark:text-[#94a3b8] mb-1.5 font-medium">
+                  分类主题标色
+                </label>
                 <div className="flex items-center space-x-2">
                   {colorPresets.map((color) => (
                     <button
@@ -540,7 +549,7 @@ export const CategoriesPage: React.FC = () => {
                       type="button"
                       onClick={() => setCatColor(color)}
                       className={`w-6 h-6 rounded-full border-2 transition-transform ${
-                        catColor === color ? 'scale-110 border-white' : 'border-transparent hover:scale-105'
+                        catColor === color ? 'scale-110 ring-2 ring-offset-2 ring-slate-400 dark:ring-white border-transparent' : 'border-transparent hover:scale-105'
                       }`}
                       style={{ backgroundColor: color }}
                     />
@@ -549,11 +558,11 @@ export const CategoriesPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-[#1e293b]">
+            <div className="flex items-center justify-end space-x-2 pt-3 border-t border-slate-200 dark:border-[#1e293b]">
               <button
                 type="button"
                 onClick={() => setIsAddingCategory(false)}
-                className="px-3 py-1.5 rounded-lg border border-[#1e293b] text-xs text-[#94a3b8] hover:text-white"
+                className="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-[#1e293b] text-xs text-slate-700 dark:text-[#94a3b8] hover:bg-slate-100 dark:hover:bg-[#162032]"
               >
                 取消
               </button>
@@ -571,31 +580,43 @@ export const CategoriesPage: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {categoryToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-[#111827] border border-[#1e293b] rounded-xl p-5 max-w-sm w-full space-y-4 shadow-2xl">
-            <div className="flex items-center space-x-3 text-amber-400">
+          <div className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-[#1e293b] rounded-xl p-5 max-w-sm w-full space-y-4 shadow-2xl">
+            <div className="flex items-center space-x-3 text-amber-500">
               <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-              <h3 className="font-semibold text-sm text-[#f1f5f9]">确认移除此分类？</h3>
+              <h3 className="font-bold text-sm text-slate-900 dark:text-[#f1f5f9]">
+                确认移除此{categoryToDelete.parentId ? '二级子类' : '一级大类'}？
+              </h3>
             </div>
-            <p className="text-xs text-[#94a3b8] leading-relaxed">
-              确定要删除分类 <strong className="text-white">“{categoryToDelete.name}”</strong> 吗？
-              {!categoryToDelete.parentId && getSubcategories(categoryToDelete.id).length > 0 && (
-                <span className="block mt-1 text-rose-400">
-                  注意：该大类下的 {getSubcategories(categoryToDelete.id).length} 个二级子类也将一并被清理。
+            <p className="text-xs text-slate-600 dark:text-[#94a3b8] leading-relaxed">
+              确定要删除分类 <strong className="text-slate-900 dark:text-white font-bold">“{categoryToDelete.name}”</strong> 吗？
+              {!categoryToDelete.parentId ? (
+                getSubcategories(categoryToDelete.id).length > 0 ? (
+                  <span className="block mt-1 text-rose-500 font-medium">
+                    注意：该大类下的 {getSubcategories(categoryToDelete.id).length} 个二级子类也将一并被清理，关联工具将转为独立未分类状态。
+                  </span>
+                ) : (
+                  <span className="block mt-1 text-rose-500">
+                    注意：删除大类后，该大类下的关联工具将转为独立未分类状态。
+                  </span>
+                )
+              ) : (
+                <span className="block mt-1 text-slate-500 dark:text-[#94a3b8]">
+                  删除后，原归属于该子类的工具将直属上一级大类。
                 </span>
               )}
             </p>
-            <div className="flex items-center justify-end space-x-2 pt-2 border-t border-[#1e293b]">
+            <div className="flex items-center justify-end space-x-2 pt-2 border-t border-slate-200 dark:border-[#1e293b]">
               <button
                 type="button"
                 onClick={() => setCategoryToDelete(null)}
-                className="px-3 py-1.5 rounded-lg border border-[#1e293b] text-xs text-[#94a3b8] hover:text-white"
+                className="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-[#1e293b] text-xs text-slate-700 dark:text-[#94a3b8] hover:bg-slate-100 dark:hover:bg-[#162032]"
               >
                 取消
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDeleteCategory}
-                className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-xs text-white font-medium"
+                className="px-4 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-xs text-white font-medium shadow-sm"
               >
                 确认删除
               </button>
@@ -606,3 +627,4 @@ export const CategoriesPage: React.FC = () => {
     </div>
   );
 };
+export default CategoriesPage;

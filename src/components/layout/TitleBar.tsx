@@ -10,6 +10,9 @@ export const TitleBar: React.FC = () => {
     switch (activeTab) {
       case 'dashboard': return '仪表盘控制台';
       case 'tools': return '全部安全工具库';
+      case 'web-tools': return 'Web 在线工具枢纽';
+      case 'cheat-sheets': return '渗透备忘手册 (Cheat Sheets)';
+      case 'poc-manager': return 'POC 漏洞验证与资产管理';
       case 'categories': return '分类与标签资产池';
       case 'tool-studio': return '工具工作台 (Tool Studio)';
       case 'settings': return '系统首选项与备份';

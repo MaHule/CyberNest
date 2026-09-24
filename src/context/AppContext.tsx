@@ -7,7 +7,9 @@ import {
   ExecutionLog,
   NavigationTab,
   ToolType,
-  ThemeMode
+  ThemeMode,
+  PocItem,
+  ToolEnvironment
 } from '../types';
 import { storageService } from '../services/storage';
 import { platformBridge } from '../services/bridge';
@@ -148,16 +150,54 @@ export function applyThemeAndAccent(theme: ThemeMode, accentColor?: string) {
     description: '',
   };
 
-  root.style.setProperty('--accent-color', preset.color);
-  root.style.setProperty('--accent-primary', preset.primary);
-  root.style.setProperty('--accent-hover', preset.hover);
-  root.style.setProperty('--accent-light', preset.light);
-  root.style.setProperty('--accent-border', preset.border);
+  if (isDark) {
+    root.style.setProperty('--accent-color', preset.color);
+    root.style.setProperty('--accent-primary', preset.primary);
+    root.style.setProperty('--accent-hover', preset.hover);
+    root.style.setProperty('--accent-light', preset.light);
+    root.style.setProperty('--accent-border', preset.border);
+  } else {
+    // In light mode, ensure accent text color is dark and saturated for clear readability
+    root.style.setProperty('--accent-color', preset.primary);
+    root.style.setProperty('--accent-primary', preset.primary);
+    root.style.setProperty('--accent-hover', preset.hover);
+    root.style.setProperty('--accent-light', hexToRgba(preset.primary, 0.1));
+    root.style.setProperty('--accent-border', hexToRgba(preset.primary, 0.3));
+  }
 }
 
-interface InitialStudioCategory {
+export function getCategoryBadgeStyle(catColor?: string, isDark: boolean = true) {
+  const baseColor = catColor || '#38bdf8';
+  if (isDark) {
+    return {
+      borderColor: `${baseColor}40`,
+      color: baseColor,
+      backgroundColor: `${baseColor}15`,
+    };
+  }
+  // Light Mode high-contrast mapping for sharp category badge typography
+  const lightColorMap: Record<string, string> = {
+    '#38bdf8': '#0284c7', // Sky-600
+    '#10b981': '#059669', // Emerald-600
+    '#f59e0b': '#b45309', // Amber-700
+    '#a855f7': '#7c3aed', // Purple-600
+    '#ef4444': '#dc2626', // Red-600
+    '#06b6d4': '#0891b2', // Cyan-600
+    '#ec4899': '#db2777', // Pink-600
+    '#64748b': '#475569', // Slate-600
+  };
+  const darkText = lightColorMap[baseColor.toLowerCase()] || baseColor;
+  return {
+    borderColor: `${darkText}40`,
+    color: darkText,
+    backgroundColor: `${darkText}12`,
+  };
+}
+
+export interface InitialStudioCategory {
   categoryId?: string;
   subcategoryId?: string | null;
+  type?: ToolType;
 }
 
 interface AppContextType {
@@ -176,6 +216,7 @@ interface AppContextType {
   settings: AppSettings;
   logs: ExecutionLog[];
   isLoading: boolean;
+  isDarkTheme: boolean;
   
   // Filtering & Search
   searchQuery: string;
@@ -194,10 +235,24 @@ interface AppContextType {
   // Editing flow
   editingToolId: string | null;
   initialStudioCategory: InitialStudioCategory | null;
-  startAddTool: (initialCategoryId?: string, initialSubcategoryId?: string | null) => void;
+  startAddTool: (initialCategoryId?: string, initialSubcategoryId?: string | null, initialType?: ToolType) => void;
   startEditTool: (toolId: string) => void;
   cancelEditTool: () => void;
   
+  // POC Data & Operations
+  pocs: PocItem[];
+  savePoc: (poc: PocItem) => Promise<PocItem>;
+  deletePoc: (id: string) => Promise<void>;
+  toggleFavoritePoc: (id: string) => Promise<void>;
+  executePoc: (poc: PocItem, customTarget?: string) => Promise<void>;
+  batchImportPocs: (newPocs: PocItem[]) => Promise<void>;
+  
+  // Environments Data & Operations (工具启动环境管理)
+  environments: ToolEnvironment[];
+  saveEnvironment: (env: ToolEnvironment) => Promise<ToolEnvironment>;
+  deleteEnvironment: (id: string) => Promise<void>;
+  setDefaultEnvironment: (id: string) => Promise<void>;
+
   // Actions
   launchTool: (tool: Tool, customArgs?: string) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
@@ -232,6 +287,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [tags, setTags] = useState<Tag[]>([]);
   const [settings, setSettings] = useState<AppSettings>({} as AppSettings);
   const [logs, setLogs] = useState<ExecutionLog[]>([]);
+  const [pocs, setPocs] = useState<PocItem[]>([]);
+  const [environments, setEnvironments] = useState<ToolEnvironment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
   // Filter state
@@ -267,18 +324,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const refreshData = async () => {
     try {
       await storageService.init();
-      const [tList, cList, tagList, sObj, lList] = await Promise.all([
+      const [tList, cList, tagList, sObj, lList, pocList, envList] = await Promise.all([
         storageService.getTools(),
         storageService.getCategories(),
         storageService.getTags(),
         storageService.getSettings(),
         storageService.getLogs(),
+        storageService.getPocs(),
+        storageService.getEnvironments(),
       ]);
       setTools(tList);
       setCategories(cList.sort((a, b) => a.sortOrder - b.sortOrder));
       setTags(tagList);
       setSettings(sObj);
       setLogs(lList);
+      setPocs(pocList);
+      setEnvironments(envList);
       
       // Sync theme & accent color
       applyThemeAndAccent(sObj.theme, sObj.accentColor);
@@ -363,12 +424,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsSidebarCollapsed((prev) => !prev);
   };
 
-  const startAddTool = (initialCategoryId?: string, initialSubcategoryId?: string | null) => {
+  const startAddTool = (
+    initialCategoryId?: string,
+    initialSubcategoryId?: string | null,
+    initialType?: ToolType
+  ) => {
     setEditingToolId(null);
-    if (initialCategoryId) {
+    if (initialCategoryId || initialType) {
       setInitialStudioCategory({
         categoryId: initialCategoryId,
         subcategoryId: initialSubcategoryId ?? null,
+        type: initialType,
       });
     } else {
       setInitialStudioCategory(null);
@@ -391,7 +457,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const launchTool = async (tool: Tool, customArgs?: string) => {
     try {
       const startTime = Date.now();
-      const result = await platformBridge.executeTool(tool, customArgs);
+      const env = tool.environmentId ? environments.find((e) => e.id === tool.environmentId) : null;
+      const result = await platformBridge.executeTool(tool, customArgs, env);
       const durationMs = Date.now() - startTime;
 
       // Update usage count in local memory and storage
@@ -512,6 +579,113 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     await refreshData();
   };
 
+  // POC actions
+  const savePoc = async (pocData: PocItem): Promise<PocItem> => {
+    const saved = await storageService.savePoc(pocData);
+    await refreshData();
+    addToast({
+      type: 'success',
+      title: 'POC 模板已保存',
+      message: saved.name,
+    });
+    return saved;
+  };
+
+  const deletePoc = async (id: string) => {
+    const target = pocs.find((p) => p.id === id);
+    await storageService.deletePoc(id);
+    setPocs((prev) => prev.filter((p) => p.id !== id));
+    addToast({
+      type: 'warning',
+      title: '已移除 POC 条目',
+      message: target?.name,
+    });
+  };
+
+  const toggleFavoritePoc = async (id: string) => {
+    const isFav = await storageService.toggleFavoritePoc(id);
+    setPocs((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, isFavorite: isFav } : p))
+    );
+    const target = pocs.find((p) => p.id === id);
+    addToast({
+      type: 'info',
+      title: isFav ? '已加入收藏' : '已取消收藏',
+      message: target?.name,
+      duration: 2000,
+    });
+  };
+
+  const executePoc = async (poc: PocItem, customTarget?: string) => {
+    await storageService.recordPocUsage(poc.id);
+    setPocs((prev) =>
+      prev.map((p) => (p.id === poc.id ? { ...p, usageCount: (p.usageCount || 0) + 1 } : p))
+    );
+    if (poc.targetPath) {
+      let cmd = poc.targetPath;
+      if (customTarget) {
+        cmd = cmd.replace(/{TARGET}/g, customTarget);
+      }
+      await platformBridge.openTerminal(cmd);
+      addToast({
+        type: 'success',
+        title: '已调用 POC 验证命令',
+        message: cmd,
+      });
+    } else if (poc.templateContent) {
+      await navigator.clipboard.writeText(poc.templateContent);
+      addToast({
+        type: 'success',
+        title: 'POC 验证模板已复制到剪贴板',
+        message: poc.name,
+      });
+    }
+  };
+
+  const batchImportPocs = async (newPocs: PocItem[]) => {
+    for (const p of newPocs) {
+      await storageService.savePoc(p);
+    }
+    await refreshData();
+    addToast({
+      type: 'success',
+      title: '批量导入成功',
+      message: `已新增 ${newPocs.length} 份 POC 验证模板`,
+    });
+  };
+
+  // Environment actions (工具启动环境管理)
+  const saveEnvironment = async (envData: ToolEnvironment): Promise<ToolEnvironment> => {
+    const saved = await storageService.saveEnvironment(envData);
+    await refreshData();
+    addToast({
+      type: 'success',
+      title: '环境配置已保存',
+      message: saved.name,
+    });
+    return saved;
+  };
+
+  const deleteEnvironment = async (id: string) => {
+    const target = environments.find((e) => e.id === id);
+    await storageService.deleteEnvironment(id);
+    await refreshData();
+    addToast({
+      type: 'warning',
+      title: '已删除环境配置',
+      message: target?.name,
+    });
+  };
+
+  const setDefaultEnvironment = async (id: string) => {
+    await storageService.setDefaultEnvironment(id);
+    await refreshData();
+    addToast({
+      type: 'success',
+      title: '已设为默认环境',
+    });
+  };
+
   const updateSettings = async (newSettings: Partial<AppSettings>) => {
     const updated = await storageService.saveSettings(newSettings);
     setSettings(updated);
@@ -583,6 +757,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return tools.filter((t) => t.isFavorite);
   }, [tools]);
 
+  const isDarkTheme = useMemo(() => {
+    if (settings.theme === 'light') return false;
+    if (settings.theme === 'dark') return true;
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return true;
+  }, [settings.theme]);
+
   return (
     <AppContext.Provider
       value={{
@@ -598,6 +781,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         settings,
         logs,
         isLoading,
+        isDarkTheme,
         searchQuery,
         setSearchQuery,
         selectedCategoryFilter,
@@ -619,6 +803,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleFavorite,
         saveTool,
         deleteTool,
+        pocs,
+        savePoc,
+        deletePoc,
+        toggleFavoritePoc,
+        executePoc,
+        batchImportPocs,
+        environments,
+        saveEnvironment,
+        deleteEnvironment,
+        setDefaultEnvironment,
         saveCategory,
         deleteCategory,
         saveTag,

@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:exe": "npm run build && powershell -ExecutionPolicy Bypass -File scripts/build-exe.ps1",
+    "package:zip": "npm run build:exe && powershell -Command \"Compress-Archive -Path CyberNest.exe, dist -DestinationPath CyberNest-v1.0.0-windows-x64.zip -Force\"",
     "preview": "vite preview",
     "tauri": "tauri"
   },

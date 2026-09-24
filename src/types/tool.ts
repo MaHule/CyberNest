@@ -7,7 +7,7 @@ export interface Tool {
   name: string;
   description: string;
   type: ToolType;
-  categoryId: string;
+  categoryId?: string | null;
   subcategoryId?: string | null;
   tags: string[];
   
@@ -32,5 +32,6 @@ export interface Tool {
   // Security / Execution flags
   runAsAdmin?: boolean;
   openInTerminal?: boolean;
+  environmentId?: string | null; // 独立配置的启动环境 ID
   notes?: string;
 }
